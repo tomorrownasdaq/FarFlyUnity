@@ -60,6 +60,8 @@ sysinfo.txt
 *.aab
 *.unitypackage
 *.app
+Firebase*
+ArtifactDB
 
 # Crashlytics generated file
 crashlytics-build.properties
