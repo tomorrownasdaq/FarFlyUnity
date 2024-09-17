@@ -121,6 +121,7 @@
 -define:ENABLE_TIMELINE
 -define:ENABLE_LEGACY_INPUT_MANAGER
 -define:TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
+-define:ENABLE_PLAYFABSERVER_API
 -define:CSHARP_7_OR_LATER
 -define:CSHARP_7_3_OR_NEWER
 -r:"C:/Program Files/Unity/Hub/Editor/2022.3.34f1/Editor/Data/Managed/UnityEngine/UnityEditor.CoreModule.dll"
@@ -346,13 +347,14 @@
 "Assets/Level/ParallaxCamera.cs.cs"
 "Assets/Level/ParallaxLayer.cs.cs"
 "Assets/Manager/BackgroundManager.cs"
-"Assets/Manager/BallManager.cs"
-"Assets/Manager/BallMessage.cs"
-"Assets/Manager/BallSpeedManager.cs"
-"Assets/Manager/CameraManager.cs"
+"Assets/Manager/Ball/BallManager.cs"
+"Assets/Manager/Ball/BallMessage.cs"
+"Assets/Manager/Ball/BallSpeedManager.cs"
+"Assets/Manager/Ball/CameraManager.cs"
 "Assets/Manager/FloorManager.cs"
 "Assets/Manager/GameOverManager.cs"
-"Assets/Manager/PlayFabLogin.cs"
+"Assets/Manager/PlayFab/PlayFabDataSync.cs"
+"Assets/Manager/PlayFab/PlayFabLogin.cs"
 "Assets/Manager/RocketAceelerator.cs"
 "Assets/Manager/Stage/Stage_1.cs"
 "Assets/Manager/StartScene.cs"

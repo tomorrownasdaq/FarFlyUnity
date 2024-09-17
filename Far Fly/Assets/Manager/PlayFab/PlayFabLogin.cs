@@ -7,6 +7,12 @@ using UnityEngine.SceneManagement; // SceneManagement 네임스페이스 추가
 
 public class PlayFabLogin : MonoBehaviour
 {
+    void Start()
+    {
+        PlayGamesPlatform.Instance.Authenticate(ProcessAuthentication);
+        
+    }
+
     public void LoginStart()
     {
         PlayGamesPlatform.Instance.Authenticate(ProcessAuthentication);
@@ -18,6 +24,11 @@ public class PlayFabLogin : MonoBehaviour
         if (status == SignInStatus.Success)
         {
             PlayGamesPlatform.Instance.RequestServerSideAccess(false, ProcessServerAuthCode);
+            SceneManager.LoadScene("MenuScene");
+        }
+        else
+        {
+            Debug.Log("Google Play Games authentication failed.");
         }
     }
 
@@ -35,13 +46,12 @@ public class PlayFabLogin : MonoBehaviour
 
     private void OnLoginWithGooglePlayGamesServicesSuccess(LoginResult result)
     {
-        Debug.Log("PF Login Success LoginWithGooglePlayGamesServices");
-        // 로그인 성공 후 MenuScene으로 전환
-        
+        Debug.Log("PlayFab Login Success with Google Play Games Services");
+        SceneManager.LoadScene("MenuScene");
     }
 
     private void OnLoginWithGooglePlayGamesServicesFailure(PlayFabError error)
     {
-        Debug.Log("PF Login Failure LoginWithGooglePlayGamesServices: " + error.GenerateErrorReport());
+        Debug.Log("PlayFab Login Failure with Google Play Games Services: " + error.GenerateErrorReport());
     }
 }

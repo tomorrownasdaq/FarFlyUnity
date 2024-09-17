@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class BallManager : MonoBehaviour
 {
-    public float accelerationRate = 5f; // Units per second squared
+    public float accelerationRate; // Units per second squared
     public float maxSpeed = 20f; // Maximum speed cap
     public float deceleration = 0.1f; // Rate of slowing down when not accelerating
     public float maxXPosition = 100f; // Maximum x position for acceleration
