@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement; // SceneManagement 네임스페이스 추가
 
 public class PlayFabLogin : MonoBehaviour
 {
+   
     void Start()
     {
         PlayGamesPlatform.Instance.Authenticate(ProcessAuthentication);

@@ -17,6 +17,7 @@ public class PlayFabDataSync : MonoBehaviour
     public string ActiveUploadFileName;
     public string NewFileName;
     public int GlobalFileLock = 0; // Kind of cheap and simple way to handle this kind of lock
+   
 
     public void Start()
     {
@@ -26,9 +27,10 @@ public class PlayFabDataSync : MonoBehaviour
             Please change the titleId below to your own titleId from PlayFab Game Manager.
             If you have already set the value in the Editor Extensions, this can be skipped.
             */
-            PlayFabSettings.staticSettings.TitleId = "42";
+            PlayFabSettings.staticSettings.TitleId = "4AD5e";
+            PlayFabSettings.staticSettings.DeveloperSecretKey = "TP3GPW6KTFBWRUS7ZEZIJ19DTS7G5NHF3YRQ7RNHSFD7RPRAM6";
         }
-        var request = new LoginWithCustomIDRequest { CustomId = "GettingStartedGuide", CreateAccount = true };
+        var request = new LoginWithCustomIDRequest { CustomId = SystemInfo.deviceUniqueIdentifier, CreateAccount = true };
         PlayFabClientAPI.LoginWithCustomID(request, OnLoginSuccess, OnLoginFailure);
     }
     private void OnLoginFailure(PlayFabError error)
@@ -71,7 +73,8 @@ public class PlayFabDataSync : MonoBehaviour
         {
             Data = new Dictionary<string, string>() {
             {"Ancestor", "Arthur"},
-            {"Successor", "Fred"}
+            {"Successor", "Fred"},
+            {"UserAceelrationRate", "3"}
         }
         },
         result => Debug.Log("Successfully updated user data"),

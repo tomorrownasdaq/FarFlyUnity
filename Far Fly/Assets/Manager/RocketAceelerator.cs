@@ -18,13 +18,13 @@ public class RocketAccelerator : MonoBehaviour
     void Start()
     {
         rocketRigidbody = GetComponent<Rigidbody2D>();
-
+        
         // 버튼을 화면 하단에 배치
         accelerateButton.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f, 0);
         accelerateButton.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f, 0);
         accelerateButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 50);
         accelerateButton.onClick.AddListener(TryStartAcceleration);
-
+        
         UpdateButtonInteractable();
     }
 
