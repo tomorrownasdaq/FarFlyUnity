@@ -118,6 +118,7 @@
 -define:ENABLE_TIMELINE
 -define:ENABLE_LEGACY_INPUT_MANAGER
 -define:TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
+-define:ENABLE_PLAYFABSERVER_API
 -define:CSHARP_7_OR_LATER
 -define:CSHARP_7_3_OR_NEWER
 -define:UNITY_EDITOR_ONLY_COMPILATION
@@ -126,8 +127,17 @@
 -r:"Assets/ExternalDependencyManager/Editor/1.2.182/Google.PackageManagerResolver.dll"
 -r:"Assets/ExternalDependencyManager/Editor/1.2.182/Google.VersionHandlerImpl.dll"
 -r:"Assets/ExternalDependencyManager/Editor/Google.VersionHandler.dll"
+<<<<<<< HEAD
 -r:"Assets/Parse/Plugins/Unity.Compat.dll"
 -r:"Assets/Parse/Plugins/Unity.Tasks.dll"
+=======
+-r:"Assets/PlayFabEditorExtensions/Editor/Resources/Microsoft.Identity.Client.dll"
+-r:"Assets/PlayFabEditorExtensions/Editor/Resources/Microsoft.IdentityModel.Clients.ActiveDirectory.dll"
+-r:"Assets/PlayFabEditorExtensions/Editor/Resources/Microsoft.IdentityModel.JsonWebTokens.dll"
+-r:"Assets/PlayFabEditorExtensions/Editor/Resources/Microsoft.IdentityModel.Logging.dll"
+-r:"Assets/PlayFabEditorExtensions/Editor/Resources/Microsoft.IdentityModel.Tokens.dll"
+-r:"Assets/PlayFabEditorExtensions/Editor/Resources/System.IdentityModel.Tokens.Jwt.dll"
+>>>>>>> feature/DV
 -r:"C:/Program Files/Unity/Hub/Editor/2022.3.34f1/Editor/Data/Managed/UnityEditor.Graphs.dll"
 -r:"C:/Program Files/Unity/Hub/Editor/2022.3.34f1/Editor/Data/Managed/UnityEngine/UnityEditor.CoreModule.dll"
 -r:"C:/Program Files/Unity/Hub/Editor/2022.3.34f1/Editor/Data/Managed/UnityEngine/UnityEditor.DeviceSimulatorModule.dll"
@@ -346,8 +356,12 @@
 -r:"C:/Program Files/Unity/Hub/Editor/2022.3.34f1/Editor/Data/UnityReferenceAssemblies/unity-4.8-api/System.Transactions.dll"
 -r:"C:/Program Files/Unity/Hub/Editor/2022.3.34f1/Editor/Data/UnityReferenceAssemblies/unity-4.8-api/System.Xml.dll"
 -r:"C:/Program Files/Unity/Hub/Editor/2022.3.34f1/Editor/Data/UnityReferenceAssemblies/unity-4.8-api/System.Xml.Linq.dll"
+-r:"Library/PackageCache/com.unity.collections@1.2.4/Unity.Collections.LowLevel.ILSupport/Unity.Collections.LowLevel.ILSupport.dll"
+-r:"Library/PackageCache/com.unity.ext.nunit@1.0.6/net35/unity-custom/nunit.framework.dll"
 -r:"Library/Bee/artifacts/1300b0aE.dag/Unity.TextMeshPro.ref.dll"
+-r:"Library/Bee/artifacts/1300b0aE.dag/UnityEditor.TestRunner.ref.dll"
 -r:"Library/Bee/artifacts/1300b0aE.dag/UnityEditor.UI.ref.dll"
+-r:"Library/Bee/artifacts/1300b0aE.dag/UnityEngine.TestRunner.ref.dll"
 -r:"Library/Bee/artifacts/1300b0aE.dag/UnityEngine.UI.ref.dll"
 -analyzer:"C:/Program Files/Unity/Hub/Editor/2022.3.34f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.Properties.SourceGenerator.dll"
 -analyzer:"C:/Program Files/Unity/Hub/Editor/2022.3.34f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.SourceGenerators.dll"

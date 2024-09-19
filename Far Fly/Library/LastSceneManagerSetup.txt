@@ -1,5 +1,9 @@
 sceneSetups:
+<<<<<<< HEAD
 - path: Assets/Scenes/Login.unity
+=======
+- path: Assets/Scenes/MenuScene.unity
+>>>>>>> feature/DV
   isLoaded: 1
   isActive: 1
   isSubScene: 0
