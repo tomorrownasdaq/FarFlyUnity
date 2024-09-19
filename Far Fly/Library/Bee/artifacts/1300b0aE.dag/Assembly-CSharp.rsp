@@ -386,6 +386,7 @@
 "Assets/Manager/PlayFab/PlayFabLogin.cs"
 "Assets/Manager/PlayFab/ShopManager.cs"
 "Assets/Manager/RocketAceelerator.cs"
+"Assets/Manager/ShopPanelManager.cs"
 "Assets/Manager/Stage/Stage_1.cs"
 "Assets/Manager/StartScene.cs"
 "Assets/TutorialInfo/Scripts/Readme.cs"
