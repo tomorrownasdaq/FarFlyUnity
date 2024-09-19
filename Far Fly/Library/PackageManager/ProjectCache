@@ -5,16 +5,16 @@ m_ProjectFiles:
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 638621805078901107
-    m_Hash: 2535758082
+      ticks: 638623307746249959
+    m_Hash: 1758748136
   m_LockFileStatus:
     m_FilePath: C:/Users/PUS_DESK/OneDrive/Documents/Far Fly/FarFlyUnity/Far Fly/Packages/packages-lock.json
     m_PathExists: 1
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 638621805079097683
-    m_Hash: 2929591947
+      ticks: 638623307746269915
+    m_Hash: 1680386539
 m_EmbeddedPackageManifests:
   m_ManifestsStatus: {}
 m_LocalPackages:
@@ -3751,7 +3751,7 @@ m_ResolvedPackages:
     - 2.5.0-exp.1
     - 2.5.0-pre.2
     - 2.5.1
-    recommended: 2.4.3
+    recommended: 2.5.1
     deprecated: []
   dependencies:
   - name: com.unity.burst
@@ -3796,7 +3796,7 @@ m_ResolvedPackages:
   unityLifecycle:
     version: 1.2.4
     nextVersion: 
-    recommendedVersion: 2.4.0
+    recommendedVersion: 2.5.1
     isDeprecated: 0
     deprecationMessage: 
   isDeprecated: 0
@@ -3955,11 +3955,13 @@ m_ResolvedPackages:
     - 1.8.15
     - 1.8.16
     - 1.8.17
+    - 1.8.18
     compatible:
     - 1.8.15
     - 1.8.16
     - 1.8.17
-    recommended: 1.8.17
+    - 1.8.18
+    recommended: 1.8.18
     deprecated: []
   dependencies:
   - name: com.unity.mathematics
