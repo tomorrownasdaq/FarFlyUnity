@@ -5,7 +5,7 @@ using PlayFab;
 using PlayFab.ClientModels;
 
 
-public class ShopManager : MonoBehaviour
+public class ShopDataManager : MonoBehaviour
 {
     public void PurchaseItem(string itemId, int price, string currencyCode)
     {
