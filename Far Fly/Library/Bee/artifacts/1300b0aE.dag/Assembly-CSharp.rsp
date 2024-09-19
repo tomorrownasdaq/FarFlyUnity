@@ -382,6 +382,7 @@
 "Assets/Manager/Ball/CameraManager.cs"
 "Assets/Manager/FloorManager.cs"
 "Assets/Manager/GameOverManager.cs"
+"Assets/Manager/PlayFab/PlayFabCurrencySync.cs"
 "Assets/Manager/PlayFab/PlayFabDataSync.cs"
 "Assets/Manager/PlayFab/PlayFabLogin.cs"
 "Assets/Manager/PlayFab/ShopManager.cs"
