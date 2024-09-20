@@ -1,20 +1,21 @@
 using UnityEngine;
 using UnityEngine.Purchasing;
+using System.Collections.Generic;
 using TMPro;
 using System;
+using PlayFab;
+using PlayFab.ClientModels;
 
 public class DiamondPurchaser : MonoBehaviour, IStoreListener
 {
     private const string DIAMOND_PACK_ID = "dia10";
+    private const string VIRTUAL_CURRENCY_CODE = "DI"; // PlayFab에서 설정한 다이아몬드의 Virtual Currency 코드
     private int currentDiamonds = 0;
     [SerializeField] private TextMeshProUGUI DiamondText;
     private static IStoreController storeController;
     private static IExtensionProvider storeExtensionProvider;
 
-    
-    [SerializeField] private float initializationDelay = 2f; // 지연 시간(초)
-
-    // 다른 변수들...
+    [SerializeField] private float initializationDelay = 2f;
 
     void Start()
     {
@@ -27,28 +28,30 @@ public class DiamondPurchaser : MonoBehaviour, IStoreListener
         InitializePurchasing();
     }
 
-
     private void LoadInitialDiamondCount()
     {
-        if (DiamondText != null && !string.IsNullOrEmpty(DiamondText.text))
-        {
-            if (int.TryParse(DiamondText.text, out int initialCount))
-            {
-                currentDiamonds = initialCount;
-                Debug.Log($"초기 다이아몬드 개수: {currentDiamonds}");
+        GetVirtualCurrencyBalance();
+    }
+
+    private void GetVirtualCurrencyBalance()
+    {
+        PlayFabClientAPI.GetUserInventory(new GetUserInventoryRequest(),
+            result => {
+                if (result.VirtualCurrency.TryGetValue(VIRTUAL_CURRENCY_CODE, out int balance))
+                {
+                    currentDiamonds = balance;
+                    UpdateDiamondText();
+                    Debug.Log($"PlayFab에서 다이아몬드 잔액을 가져왔습니다: {currentDiamonds}");
+                }
+                else
+                {
+                    Debug.LogWarning($"PlayFab에서 {VIRTUAL_CURRENCY_CODE} 통화를 찾을 수 없습니다.");
+                }
+            },
+            error => {
+                Debug.LogError($"PlayFab에서 다이아몬드 잔액을 가져오는 데 실패했습니다: {error.ErrorMessage}");
             }
-            else
-            {
-                Debug.LogWarning("텍스트에서 초기 다이아몬드 개수를 읽어올 수 없습니다. 0으로 초기화합니다.");
-                currentDiamonds = 0;
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Diamond Text UI가 할당되지 않았거나 비어 있습니다. 0으로 초기화합니다.");
-            currentDiamonds = 0;
-        }
-        UpdateDiamondText();
+        );
     }
 
     private void InitializePurchasing()
@@ -112,8 +115,7 @@ public class DiamondPurchaser : MonoBehaviour, IStoreListener
     {
         if (string.Equals(args.purchasedProduct.definition.id, DIAMOND_PACK_ID, System.StringComparison.Ordinal))
         {
-            AddDiamonds(10);
-            Debug.Log($"구매 성공: Diamond Pack. 현재 다이아몬드: {currentDiamonds}");
+            AddDiamondsToPlayFab(10);
             return PurchaseProcessingResult.Complete;
         }
         else
@@ -128,11 +130,24 @@ public class DiamondPurchaser : MonoBehaviour, IStoreListener
         Debug.LogError($"구매 실패: {product.definition.id}, 이유: {failureReason}");
     }
 
-    private void AddDiamonds(int amount)
+    private void AddDiamondsToPlayFab(int amount)
     {
-        currentDiamonds += amount;
-        UpdateDiamondText();
-        Debug.Log($"다이아몬드 {amount}개 추가됨. 총 다이아몬드: {currentDiamonds}");
+        var request = new AddUserVirtualCurrencyRequest
+        {
+            VirtualCurrency = VIRTUAL_CURRENCY_CODE,
+            Amount = amount
+        };
+
+        PlayFabClientAPI.AddUserVirtualCurrency(request,
+            result => {
+                currentDiamonds = result.Balance;
+                UpdateDiamondText();
+                Debug.Log($"다이아몬드 {amount}개 추가됨. 현재 다이아몬드: {currentDiamonds}");
+            },
+            error => {
+                Debug.LogError($"PlayFab 다이아몬드 추가 실패: {error.ErrorMessage}");
+            }
+        );
     }
 
     private void UpdateDiamondText()
