@@ -6,10 +6,10 @@ using System;
 using PlayFab;
 using PlayFab.ClientModels;
 
-public class DiamondPurchaser : MonoBehaviour, IStoreListener
+public class Gold500Purchaser : MonoBehaviour, IStoreListener
 {
-    private const string DIAMOND_PACK_ID = "dia10";
-    private const string VIRTUAL_CURRENCY_CODE = "DI"; // PlayFab에서 설정한 다이아몬드의 Virtual Currency 코드
+    private const string DIAMOND_PACK_ID = "gd500";
+    private const string VIRTUAL_CURRENCY_CODE = "GL"; // PlayFab에서 설정한 다이아몬드의 Virtual Currency 코드
     private int currentDiamonds = 0;
     [SerializeField] private TextMeshProUGUI DiamondText;
     private static IStoreController storeController;
@@ -115,7 +115,7 @@ public class DiamondPurchaser : MonoBehaviour, IStoreListener
     {
         if (string.Equals(args.purchasedProduct.definition.id, DIAMOND_PACK_ID, System.StringComparison.Ordinal))
         {
-            AddDiamondsToPlayFab(10);
+            AddDiamondsToPlayFab(500);
             return PurchaseProcessingResult.Complete;
         }
         else
