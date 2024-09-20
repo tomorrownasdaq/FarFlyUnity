@@ -1,8 +1,12 @@
 sceneSetups:
 <<<<<<< HEAD
+<<<<<<< HEAD
 - path: Assets/Scenes/Login.unity
 =======
 - path: Assets/Scenes/MenuScene.unity
+>>>>>>> feature/DV
+=======
+- path: Assets/Scenes/Login.unity
 >>>>>>> feature/DV
   isLoaded: 1
   isActive: 1

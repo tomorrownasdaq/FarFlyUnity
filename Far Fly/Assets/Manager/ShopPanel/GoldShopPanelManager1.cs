@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ShopPanelManager : MonoBehaviour
+public class GoldShopPanelManager : MonoBehaviour
 {
 
     public GameObject shopPanel; // Inspector에서 Shop Panel을 할당할 변수
