@@ -1,15 +1,27 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraManager : MonoBehaviour
-
-
 {
-    private Rigidbody2D rb;
-    public Transform target; // The ball to follow
-    public float smoothSpeed = 0.125f; // The speed at which the camera follows the target
-    public Vector3 offset; // The offset position relative to the target
+    public Transform target; // 따라갈 공(ball)
+    public float smoothSpeed = 0.125f; // 카메라가 따라가는 속도
+    public float leftOffset = 2f; // 공을 화면 왼쪽에 두기 위한 X축 오프셋
+    public float verticalOffset = 1f; // 수직 오프셋 (필요에 따라 조정)
+
+    private Camera cam;
+    private float halfWidth;
+
+    private void Start()
+    {
+        cam = GetComponent<Camera>();
+        if (cam == null)
+        {
+            Debug.LogError("Camera component not found!");
+            return;
+        }
+
+        // 카메라의 절반 너비 계산
+        halfWidth = cam.orthographicSize * cam.aspect;
+    }
 
     private void FixedUpdate()
     {
@@ -19,16 +31,17 @@ public class CameraManager : MonoBehaviour
             return;
         }
 
-        // Calculate the desired position
-        Vector3 desiredPosition = target.position + offset;
+        // 목표 위치 계산 (공의 오른쪽, 약간 위)
+        Vector3 desiredPosition = new Vector3(
+            target.position.x + halfWidth - leftOffset,
+            target.position.y + verticalOffset,
+            transform.position.z
+        );
 
-        // Smoothly interpolate between the camera's current position and the desired position
+        // 현재 위치에서 목표 위치로 부드럽게 이동
         Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
 
-        // Update the camera's position
+        // 카메라 위치 업데이트
         transform.position = smoothedPosition;
-
-        // Make the camera look at the target
-        transform.LookAt(target);
     }
 }

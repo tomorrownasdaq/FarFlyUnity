@@ -46,7 +46,7 @@ public class FloorManager : MonoBehaviour
         Vector3 spawnPosition = new Vector3(lastFloorX, floorPrefab.transform.position.y, 0.1f);
         GameObject newFloor = Instantiate(floorPrefab, spawnPosition, Quaternion.identity);
         floorObjects.Add(newFloor);
-        lastFloorX = newFloor.transform.position.x + floorWidth + 80f;
+        lastFloorX = newFloor.transform.position.x + floorWidth + 1000f;
     }
 
     void CalculateFloorWidth()

@@ -5,7 +5,7 @@ public class BallSpeedManager : MonoBehaviour
     public Rigidbody2D ballRigidbody;
     public float stopThreshold = 0.1f;
     
-    private bool gameOver = false;
+    public bool gameOver = false;
     private Vector2 initialPosition;
     private float distanceTraveled = 0f;
 
@@ -29,7 +29,7 @@ public class BallSpeedManager : MonoBehaviour
             distanceTraveled = Vector2.Distance(initialPosition, ballRigidbody.position);
 
             // 정지 상태 확인
-            if (currentSpeed < stopThreshold && transform.position.x > 2)
+            if (currentSpeed < stopThreshold && transform.position.x > 2 )
             {
                 gameOver = true;
                 GameOver();

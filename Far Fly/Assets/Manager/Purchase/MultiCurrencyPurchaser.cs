@@ -13,7 +13,7 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
     private const string GOLD_PACK_ID = "gd500";
     private const string DIAMOND_CURRENCY_CODE = "DI";
     private const string POWER_CURRENCY_CODE = "PW";
-    private const string GOLD_CURRENCY_CODE = "GL";
+    private const string GOLD_CURRENCY_CODE = "GL";  // 신규화폐아이템목록들 여기에 추가. 아래에 더있음
 
     private int currentDiamonds = 0;
     private int currentPower = 0;
@@ -77,7 +77,7 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
         var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
         builder.AddProduct(DIAMOND_PACK_ID, ProductType.Consumable);
         builder.AddProduct(POWER_PACK_ID, ProductType.Consumable);
-        builder.AddProduct(GOLD_PACK_ID, ProductType.Consumable);
+        builder.AddProduct(GOLD_PACK_ID, ProductType.Consumable);   // 신규화폐아이템목록들 여기에 추가. 아래에 더있음
         UnityPurchasing.Initialize(this, builder);
     }
 
@@ -130,7 +130,7 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
         Debug.LogError($"IAP 초기화 실패: {error}. 추가 정보: {errorMessage}");
     }
 
-    public PurchaseProcessingResult ProcessPurchase(PurchaseEventArgs args)
+    public PurchaseProcessingResult ProcessPurchase(PurchaseEventArgs args) // 신규화폐아이템목록들 여기에 추가.
     {
         if (string.Equals(args.purchasedProduct.definition.id, DIAMOND_PACK_ID, StringComparison.Ordinal))
         {
