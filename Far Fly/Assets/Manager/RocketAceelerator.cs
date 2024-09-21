@@ -9,9 +9,11 @@ public class RocketItemButtonAccelerator : MonoBehaviour
     public float accelerationForceX = 10f;
     public float accelerationForceY = 5f;
     public float accelerationDuration = 2f;
-    public float activationX = 100f;
+    public float activationX = 10f;
     public int maxUsageCount = 3;
-    public GameObject gameOverPanel; // Changed from gameOverCanvas to gameOverPanel
+
+    // BallSpeedManager 참조 추가
+    public BallSpeedManager ballSpeedManager;
 
     private Rigidbody2D ballRigidbody;
     private bool isAccelerating = false;
@@ -36,6 +38,17 @@ public class RocketItemButtonAccelerator : MonoBehaviour
             Debug.LogError("Rocket Item Button is not assigned!");
             return;
         }
+
+        // BallSpeedManager 찾기
+        if (ballSpeedManager == null)
+        {
+            ballSpeedManager = FindObjectOfType<BallSpeedManager>();
+            if (ballSpeedManager == null)
+            {
+                Debug.LogError("BallSpeedManager not found in the scene!");
+            }
+        }
+
         rocketItemButton.onClick.AddListener(TryActivateRocketItem);
         remainingUses = maxUsageCount;
         UpdateUI();
@@ -66,7 +79,6 @@ public class RocketItemButtonAccelerator : MonoBehaviour
     void TryActivateRocketItem()
     {
         bool isGameOver = IsGameOver();
-
         if (!isGameOver && !isAccelerating && ballObject.transform.position.x > activationX && remainingUses > 0)
         {
             StartAcceleration();
@@ -105,8 +117,16 @@ public class RocketItemButtonAccelerator : MonoBehaviour
     void UpdateUI()
     {
         bool isGameOver = IsGameOver();
-        bool canUse = !isAccelerating && ballObject.transform.position.x > activationX && remainingUses > 0 && !isGameOver;
-        rocketItemButton.interactable = canUse;
+        bool isBallPastActivationPoint = ballObject != null && ballObject.transform.position.x > activationX;
+        bool hasRemainingUses = remainingUses > 0;
+
+        bool canUse = !isGameOver && !isAccelerating && isBallPastActivationPoint && hasRemainingUses;
+
+        if (rocketItemButton != null)
+        {
+            rocketItemButton.interactable = canUse;
+        }
+
         if (itemCountText != null)
         {
             itemCountText.text = $"{remainingUses}";
@@ -115,6 +135,21 @@ public class RocketItemButtonAccelerator : MonoBehaviour
 
     bool IsGameOver()
     {
-        return gameOverPanel != null && gameOverPanel.activeSelf;
+        return ballSpeedManager != null && ballSpeedManager.gameOver;
+    }
+
+    void OnEnable()
+    {
+        InvokeRepeating("LogStatus", 0f, 1f);
+    }
+
+    void OnDisable()
+    {
+        CancelInvoke("LogStatus");
+    }
+
+    void LogStatus()
+    {
+       
     }
 }

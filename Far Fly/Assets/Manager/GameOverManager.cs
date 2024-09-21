@@ -5,12 +5,14 @@ using UnityEngine.SceneManagement;
 public class GameOverManager : MonoBehaviour
 {
     public static GameOverManager Instance { get; private set; }
-    public GameObject gameOverCanvasPrefab;
+    public GameObject gameOverPanelPrefab;
     public string menuSceneName = "StageScene";
-    private GameObject gameOverCanvasInstance;
+
+    private GameObject gameOverPanelInstance;
     private Text distanceText;
     private Button retryButton;
     private Button menuButton;
+    private Canvas parentCanvas;
 
     private void Awake()
     {
@@ -18,8 +20,8 @@ public class GameOverManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            CreateGameOverCanvas();
-            HideGameOverCanvas();  // Awake에서도 캔버스를 숨깁니다.
+            CreateGameOverPanel();
+            HideGameOverPanel();
         }
         else
         {
@@ -36,29 +38,43 @@ public class GameOverManager : MonoBehaviour
     {
         if (scene.name != menuSceneName)
         {
-            if (gameOverCanvasInstance == null)
+            if (gameOverPanelInstance == null)
             {
-                CreateGameOverCanvas();
+                CreateGameOverPanel();
             }
-            HideGameOverCanvas(); // 새 씬이 로드될 때마다 캔버스와 버튼들을 숨깁니다.
+            HideGameOverPanel();
         }
     }
 
-    private void CreateGameOverCanvas()
+    private void CreateGameOverPanel()
     {
-        if (gameOverCanvasInstance == null)
+        if (gameOverPanelInstance == null)
         {
-            gameOverCanvasInstance = Instantiate(gameOverCanvasPrefab);
-            DontDestroyOnLoad(gameOverCanvasInstance);
+            gameOverPanelInstance = Instantiate(gameOverPanelPrefab);
+            DontDestroyOnLoad(gameOverPanelInstance);
+
+            parentCanvas = FindObjectOfType<Canvas>();
+            if (parentCanvas == null)
+            {
+                GameObject canvasObject = new GameObject("MainCanvas");
+                parentCanvas = canvasObject.AddComponent<Canvas>();
+                parentCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                canvasObject.AddComponent<CanvasScaler>();
+                canvasObject.AddComponent<GraphicRaycaster>();
+                DontDestroyOnLoad(canvasObject);
+            }
+
+            gameOverPanelInstance.transform.SetParent(parentCanvas.transform, false);
+
             SetupUI();
-            gameOverCanvasInstance.SetActive(false);  // 생성 직후 캔버스를 숨깁니다.
+            gameOverPanelInstance.SetActive(false);
         }
     }
 
     private void SetupUI()
     {
-        distanceText = gameOverCanvasInstance.GetComponentInChildren<Text>();
-        Button[] buttons = gameOverCanvasInstance.GetComponentsInChildren<Button>(true);
+        distanceText = gameOverPanelInstance.GetComponentInChildren<Text>();
+        Button[] buttons = gameOverPanelInstance.GetComponentsInChildren<Button>(true);
         if (buttons.Length >= 2)
         {
             retryButton = buttons[0];
@@ -68,18 +84,13 @@ public class GameOverManager : MonoBehaviour
             menuButton.onClick.RemoveAllListeners();
             menuButton.onClick.AddListener(GoToMenu);
         }
-        else
-        {
-            Debug.LogError("Not enough buttons found in the GameOver Canvas!");
-        }
     }
 
-    private void HideGameOverCanvas()
+    private void HideGameOverPanel()
     {
-        if (gameOverCanvasInstance != null)
+        if (gameOverPanelInstance != null)
         {
-            gameOverCanvasInstance.SetActive(false);
-            Debug.Log("GameOverCanvas hidden. Active state: " + gameOverCanvasInstance.activeSelf);
+            gameOverPanelInstance.SetActive(false);
         }
         if (retryButton != null)
         {
@@ -93,14 +104,13 @@ public class GameOverManager : MonoBehaviour
 
     public void ShowGameOver(float distance)
     {
-        
-        if (gameOverCanvasInstance == null)
+        if (gameOverPanelInstance == null)
         {
-            CreateGameOverCanvas();
+            CreateGameOverPanel();
         }
         UpdateDistanceText(distance);
-        gameOverCanvasInstance.SetActive(true);
-        // 게임 오버 시 버튼들을 표시합니다.
+        gameOverPanelInstance.SetActive(true);
+
         if (retryButton != null)
         {
             retryButton.gameObject.SetActive(true);
@@ -121,13 +131,13 @@ public class GameOverManager : MonoBehaviour
 
     private void RetryGame()
     {
-        HideGameOverCanvas();
+        HideGameOverPanel();
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     private void GoToMenu()
     {
-        HideGameOverCanvas();
+        HideGameOverPanel();
         SceneManager.LoadScene(menuSceneName);
     }
 
