@@ -1,16 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using PlayFab;
+using PlayFab.ClientModels;
 
 public class BallManager : MonoBehaviour
 {
-    public float accelerationRate; // Units per second squared
+    public float accelerationRate = 8000f; // Default value
     public float maxSpeed = 20f; // Maximum speed cap
-    public float deceleration = 0.1f; // Rate of slowing down when not accelerating
+    public float deceleration = 500f; // Default value
     public float maxXPosition = 100f; // Maximum x position for acceleration
     public float maxMapPosition = 100f; // Maximum x position for acceleration
-
     private Rigidbody2D rb;
     private float currentSpeed = 0f;
     private bool isAccelerating = false;
@@ -23,9 +23,8 @@ public class BallManager : MonoBehaviour
             Debug.LogError("Rigidbody2D component is missing from the ball!");
         }
 
-
-
-
+        // Load values from PlayFab when the game starts
+        LoadValuesFromPlayFab();
     }
 
     void Update()
@@ -35,7 +34,6 @@ public class BallManager : MonoBehaviour
         {
             isAccelerating = true;
         }
-
         // Check for touch input
         if (Input.touchCount > 0)
         {
@@ -45,14 +43,10 @@ public class BallManager : MonoBehaviour
                 isAccelerating = true;
             }
         }
-
     }
-
 
     void FixedUpdate()
     {
-
-
         if (isAccelerating && transform.position.x < maxXPosition)
         {
             // Accelerate
@@ -60,8 +54,6 @@ public class BallManager : MonoBehaviour
             currentSpeed = Mathf.Min(currentSpeed, maxSpeed); // Cap the speed
             rb.velocity = new Vector2(currentSpeed, rb.velocity.y);
         }
-
-
         else
         {
             // Decelerate
@@ -75,36 +67,57 @@ public class BallManager : MonoBehaviour
                 currentSpeed = rb.velocity.x + deceleration * Time.fixedDeltaTime;
                 rb.velocity = new Vector2(currentSpeed, rb.velocity.y);
             }
-
         }
-
-
-        void OnCollisionEnter2D(Collision2D collision)
-        {
-            if (collision.gameObject.CompareTag("Wall"))
-
-            {
-                // Reverse the x-velocity
-                rb.velocity = new Vector2(-rb.velocity.x, rb.velocity.y);
-
-            }
-        }
-
-
-        // Apply the velocity
-        //Vector2 newVelocity = rb.velocity;
-        //newVelocity.x = currentSpeed;
-        //rb.velocity = newVelocity;
-
-
-        // Clamp the ball's position to prevent it from going beyond maxXPosition
-        //if (transform.position.x > maxMapPosition)
-        //{
-        //    transform.position = new Vector2(maxXPosition, transform.position.y);
-        //    currentSpeed = 0f; // Stop the ball
-        //}
 
         // Reset acceleration flag
         isAccelerating = false;
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Wall"))
+        {
+            // Reverse the x-velocity
+            rb.velocity = new Vector2(-rb.velocity.x, rb.velocity.y);
+        }
+    }
+
+    // Load values from PlayFab
+    void LoadValuesFromPlayFab()
+    {
+        PlayFabClientAPI.GetUserData(new GetUserDataRequest(), OnDataReceived, OnError);
+    }
+
+    // Callback for when data is received from PlayFab
+    void OnDataReceived(GetUserDataResult result)
+    {
+        if (result.Data != null)
+        {
+            if (result.Data.ContainsKey("AccelerationRate"))
+            {
+                if (float.TryParse(result.Data["AccelerationRate"].Value, out float loadedAccelerationRate))
+                {
+                    accelerationRate = loadedAccelerationRate;
+                }
+            }
+            if (result.Data.ContainsKey("Deceleration"))
+            {
+                if (float.TryParse(result.Data["Deceleration"].Value, out float loadedDeceleration))
+                {
+                    deceleration = loadedDeceleration;
+                }
+            }
+        }
+        else
+        {
+            Debug.Log("No data found in PlayFab. Using default values: AccelerationRate = 8000, Deceleration = 500");
+        }
+    }
+
+    // Error callback
+    void OnError(PlayFabError error)
+    {
+        Debug.LogError("PlayFab Error: " + error.GenerateErrorReport());
+        Debug.Log("Using default values: AccelerationRate = 8000, Deceleration = 500");
     }
 }

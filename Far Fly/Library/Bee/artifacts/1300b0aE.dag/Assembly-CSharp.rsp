@@ -124,6 +124,12 @@
 -define:ENABLE_PLAYFABSERVER_API
 -define:CSHARP_7_OR_LATER
 -define:CSHARP_7_3_OR_NEWER
+-r:"Assets/Firebase/Plugins/Firebase.App.dll"
+-r:"Assets/Firebase/Plugins/Firebase.Auth.dll"
+-r:"Assets/Firebase/Plugins/Firebase.Database.dll"
+-r:"Assets/Firebase/Plugins/Firebase.Platform.dll"
+-r:"Assets/Firebase/Plugins/Firebase.TaskExtension.dll"
+-r:"Assets/Firebase/Plugins/Google.MiniJson.dll"
 -r:"C:/Program Files/Unity/Hub/Editor/2022.3.34f1/Editor/Data/Managed/UnityEngine/UnityEditor.CoreModule.dll"
 -r:"C:/Program Files/Unity/Hub/Editor/2022.3.34f1/Editor/Data/Managed/UnityEngine/UnityEditor.DeviceSimulatorModule.dll"
 -r:"C:/Program Files/Unity/Hub/Editor/2022.3.34f1/Editor/Data/Managed/UnityEngine/UnityEditor.DiagnosticsModule.dll"
@@ -396,7 +402,7 @@
 "Assets/Manager/PlayFab/PlayFabCurrencySync.cs"
 "Assets/Manager/PlayFab/PlayFabDataSync.cs"
 "Assets/Manager/PlayFab/PlayFabLogin.cs"
-"Assets/Manager/PlayFab/ShopManager.cs"
+"Assets/Manager/PlayFab/PlayFabShopManager.cs"
 "Assets/Manager/Purchase/MultiCurrencyPurchaser.cs"
 "Assets/Manager/RocketAceelerator.cs"
 "Assets/Manager/ShopPanel/DiaShopPanelManager2.cs"
