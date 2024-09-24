@@ -45,7 +45,7 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
         GetCurrencyBalances();
     }
 
-    private void GetCurrencyBalances()
+    public void GetCurrencyBalances()
     {
         var request = new GetUserInventoryRequest();
 

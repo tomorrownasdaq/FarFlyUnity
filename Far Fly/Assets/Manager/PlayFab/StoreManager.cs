@@ -97,7 +97,8 @@ public class StoreManager : MonoBehaviour
             var price = item.PriceOptions.Prices[0];
             if (price.Amounts != null && price.Amounts.Count > 0)
             {
-                string priceInfo = $"{price.Amounts[0].Amount} ";
+                // Convert the price to a string, it might be a decimal or float
+                string priceInfo = price.Amounts[0].Amount.ToString();
                 Debug.Log($"Got item price: {priceInfo}");
                 return priceInfo;
             }
