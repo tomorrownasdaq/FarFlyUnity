@@ -3,6 +3,8 @@ using System.Linq;
 using UnityEngine;
 using PlayFab;
 using PlayFab.EconomyModels;
+using UnityEngine.Networking;
+using System.Collections;
 
 public class StoreManager : MonoBehaviour
 {
@@ -37,24 +39,37 @@ public class StoreManager : MonoBehaviour
 
     private void DisplayItems()
     {
-        // Clear existing items
+        // Disable existing items
         foreach (Transform child in itemListContent.transform)
         {
-            Destroy(child.gameObject);
+            child.gameObject.SetActive(false);
         }
 
-        // Create new item entries
-        foreach (var item in catalogItems)
+        // Create or enable item entries
+        for (int i = 0; i < catalogItems.Count; i++)
         {
-            GameObject newItem = Instantiate(itemPrefab, itemListContent.transform);
-            ShopItemUI shopItemUI = newItem.GetComponent<ShopItemUI>();
+            GameObject itemObject;
+            if (i < itemListContent.transform.childCount)
+            {
+                // Reuse existing object
+                itemObject = itemListContent.transform.GetChild(i).gameObject;
+                itemObject.SetActive(true);
+            }
+            else
+            {
+                // Create new object if necessary
+                itemObject = Instantiate(itemPrefab, itemListContent.transform);
+            }
+
+            ShopItemUI shopItemUI = itemObject.GetComponent<ShopItemUI>();
             if (shopItemUI != null)
             {
-                string title = GetItemTitle(item);
-                string price = GetItemPriceInfo(item);
-
-                Debug.Log($"Setting item info - Title: {title}, Price: {price}");
-                shopItemUI.SetItemInfo(title, price);
+                string title = GetItemTitle(catalogItems[i]);
+                string price = GetItemPriceInfo(catalogItems[i]);
+                string imageUrl = GetItemImageUrl(catalogItems[i]);
+                Debug.Log($"Setting item info - Title: {title}, Price: {price}, ImageUrl: {imageUrl}");
+                shopItemUI.SetItemInfo(title, price, imageUrl);
+                StartCoroutine(LoadItemImage(shopItemUI, imageUrl));
             }
             else
             {
@@ -89,6 +104,41 @@ public class StoreManager : MonoBehaviour
         }
         Debug.LogWarning("Price information not available for item");
         return "Price not available";
+    }
+
+    private string GetItemImageUrl(CatalogItem item)
+    {
+        if (item.Images != null && item.Images.Count > 0)
+        {
+            string imageUrl = item.Images[0].Url;
+            Debug.Log($"Got item image URL: {imageUrl}");
+            return imageUrl;
+        }
+        Debug.LogWarning("Image URL not available for item");
+        return null;
+    }
+
+    private IEnumerator LoadItemImage(ShopItemUI shopItemUI, string imageUrl)
+    {
+        if (string.IsNullOrEmpty(imageUrl))
+        {
+            yield break;
+        }
+
+        using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(imageUrl))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError($"Failed to load image: {www.error}");
+            }
+            else
+            {
+                Texture2D texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
+                shopItemUI.SetItemImage(texture);
+            }
+        }
     }
 
     private void OnError(PlayFabError error)

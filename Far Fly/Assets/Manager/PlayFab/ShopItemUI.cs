@@ -1,33 +1,30 @@
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class ShopItemUI : MonoBehaviour
 {
     public TextMeshProUGUI titleText;
     public TextMeshProUGUI priceText;
+    public Image itemImage;
 
-    public void SetItemInfo(string title, string price)
+    public void SetItemInfo(string title, string price, string imageUrl)
     {
-        Debug.Log($"SetItemInfo called - Title: {title}, Price: {price}");
+        titleText.text = title;
+        priceText.text = price;
+        // Image will be set separately via SetItemImage
+    }
 
-        if (titleText != null)
+    public void SetItemImage(Texture2D texture)
+    {
+        if (texture != null)
         {
-            titleText.text = title;
-            Debug.Log($"Set title text to: {title}");
+            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+            itemImage.sprite = sprite;
         }
         else
         {
-            Debug.LogError("TitleText is null");
-        }
-
-        if (priceText != null)
-        {
-            priceText.text = price;
-            Debug.Log($"Set price text to: {price}");
-        }
-        else
-        {
-            Debug.LogError("PriceText is null");
+            Debug.LogWarning("Received null texture for item image");
         }
     }
 }
