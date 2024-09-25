@@ -14,14 +14,19 @@ public class ShopItemUI : MonoBehaviour
     public TextMeshProUGUI goldText;
     private int price;
 
-    // Constants for currency IDs
     private const string GOLD_CURRENCY_ID = "GL";
+    private const string CONFIRMATION_DIALOG_PREFAB_NAME = "ConfirmationDialogPrefab";
+
+    private void Start()
+    {
+        buyButton.onClick.AddListener(OnBuyButtonClicked);
+        GetCurrencyBalances();
+    }
 
     public void SetItemInfo(string title, string itemPrice, string imageUrl)
     {
         titleText.text = title;
         priceText.text = itemPrice;
-
         // Try to parse the price string to an integer
         if (int.TryParse(itemPrice, out int parsedPrice))
         {
@@ -47,28 +52,54 @@ public class ShopItemUI : MonoBehaviour
         }
     }
 
-    private void Start()
-    {
-        buyButton.onClick.AddListener(OnBuyButtonClicked);
-        GetCurrencyBalances();
-    }
-
     private void OnBuyButtonClicked()
     {
         if (int.TryParse(goldText.text, out int currentGold))
         {
             if (currentGold >= price)
             {
-                PurchaseItem();
+                ShowConfirmationDialog();
             }
             else
             {
-                Debug.Log("Not enough gold to purchase this item.");
+                Debug.Log("아이템을 구매하기에 골드가 부족합니다.");
             }
         }
         else
         {
-            Debug.LogError("Failed to parse current gold amount.");
+            Debug.LogError("현재 골드 금액을 파싱하는 데 실패했습니다.");
+        }
+    }
+
+    private void ShowConfirmationDialog()
+    {
+        GameObject dialogPrefab = Resources.Load<GameObject>(CONFIRMATION_DIALOG_PREFAB_NAME);
+        if (dialogPrefab == null)
+        {
+            Debug.LogError($"{CONFIRMATION_DIALOG_PREFAB_NAME}을 찾을 수 없습니다. Resources 폴더에 있는지 확인하세요.");
+            return;
+        }
+
+        GameObject dialogInstance = Instantiate(dialogPrefab, transform.root);
+        dialogInstance.SetActive(true);
+
+        ConfirmationDialog dialog = dialogInstance.GetComponent<ConfirmationDialog>();
+        if (dialog != null)
+        {
+            dialog.SetMessage($"Buy {titleText.text} on {price} Gold");
+            dialog.OnConfirm += () => {
+                PurchaseItem();
+                Destroy(dialogInstance);
+            };
+            dialog.OnCancel += () => {
+                Debug.Log("구매가 취소되었습니다.");
+                Destroy(dialogInstance);
+            };
+        }
+        else
+        {
+            Debug.LogError("ConfirmationDialog 컴포넌트를 찾을 수 없습니다.");
+            Destroy(dialogInstance);
         }
     }
 
@@ -79,15 +110,14 @@ public class ShopItemUI : MonoBehaviour
             VirtualCurrency = GOLD_CURRENCY_ID,
             Amount = price
         };
-
         PlayFabClientAPI.SubtractUserVirtualCurrency(request,
             result => {
                 int newBalance = result.Balance;
                 UpdateGoldText(newBalance);
-                Debug.Log($"Item purchased successfully. New balance: {newBalance}");
+                Debug.Log($"아이템 구매 성공. 새로운 잔액: {newBalance}");
             },
             error => {
-                Debug.LogError($"Failed to purchase item: {error.ErrorMessage}");
+                Debug.LogError($"아이템 구매 실패: {error.ErrorMessage}");
             }
         );
     }
@@ -95,7 +125,6 @@ public class ShopItemUI : MonoBehaviour
     public void GetCurrencyBalances()
     {
         var request = new GetUserInventoryRequest();
-
         PlayFabClientAPI.GetUserInventory(request,
             result => {
                 int gold = result.VirtualCurrency.ContainsKey(GOLD_CURRENCY_ID) ? result.VirtualCurrency[GOLD_CURRENCY_ID] : 0;
