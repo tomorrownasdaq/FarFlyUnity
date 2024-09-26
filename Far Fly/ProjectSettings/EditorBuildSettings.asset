@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/StageScene.unity
     guid: fa7cfe087c939ac47a532888eea166bc
+  - enabled: 1
+    path: Assets/MakeUserName.unity
+    guid: 3e823db11dc4aa44b8341ee3ef225df0
   m_configObjects:
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: e10e6aaad858c0047812c3e9d7bd39ac, type: 2}
     com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000, guid: 8206a0ba7d77da84abc332d6d6ba287b, type: 2}

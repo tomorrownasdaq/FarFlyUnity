@@ -3,21 +3,20 @@ using GooglePlayGames.BasicApi;
 using PlayFab;
 using PlayFab.ClientModels;
 using UnityEngine;
-using UnityEngine.SceneManagement; // SceneManagement 네임스페이스 추가
+using UnityEngine.SceneManagement;
 
 public class PlayFabLogin : MonoBehaviour
 {
-   
     void Start()
     {
         PlayGamesPlatform.Instance.Authenticate(ProcessAuthentication);
-        
     }
 
     public void LoginStart()
     {
         PlayGamesPlatform.Instance.Authenticate(ProcessAuthentication);
-        SceneManager.LoadScene("MenuScene");
+        CheckDisplayName();
+
     }
 
     internal void ProcessAuthentication(SignInStatus status)
@@ -25,7 +24,6 @@ public class PlayFabLogin : MonoBehaviour
         if (status == SignInStatus.Success)
         {
             PlayGamesPlatform.Instance.RequestServerSideAccess(false, ProcessServerAuthCode);
-            SceneManager.LoadScene("MenuScene");
         }
         else
         {
@@ -48,11 +46,36 @@ public class PlayFabLogin : MonoBehaviour
     private void OnLoginWithGooglePlayGamesServicesSuccess(LoginResult result)
     {
         Debug.Log("PlayFab Login Success with Google Play Games Services");
-        SceneManager.LoadScene("MenuScene");
+        CheckDisplayName();
     }
 
     private void OnLoginWithGooglePlayGamesServicesFailure(PlayFabError error)
     {
         Debug.Log("PlayFab Login Failure with Google Play Games Services: " + error.GenerateErrorReport());
+    }
+
+    private void CheckDisplayName()
+    {
+        PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest(), 
+            result => 
+            {
+                if (string.IsNullOrEmpty(result.AccountInfo.TitleInfo.DisplayName))
+                {
+                    // DisplayName이 없으면 MakeUserName 씬으로 이동
+                    SceneManager.LoadScene("MakeUserName");
+                }
+                else
+                {
+                    // DisplayName이 있으면 MenuScene으로 이동
+                    SceneManager.LoadScene("MenuScene");
+                }
+            },
+            error => 
+            {
+                Debug.LogError("Failed to get account info: " + error.GenerateErrorReport());
+                // 에러 발생 시 기본적으로 MakeUserName 씬으로 이동
+                SceneManager.LoadScene("MakeUserName");
+            }
+        );
     }
 }
