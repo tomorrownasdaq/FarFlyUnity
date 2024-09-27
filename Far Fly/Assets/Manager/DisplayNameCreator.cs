@@ -12,36 +12,58 @@ public class DisplayNameCreator : MonoBehaviour
     public TextMeshProUGUI statusText;
     public Toggle agreementToggle;
 
+    private const int MIN_NAME_LENGTH = 2;
+    private const int MAX_NAME_LENGTH = 16;
+
     void Start()
     {
         goButton.onClick.AddListener(OnGoButtonClick);
         agreementToggle.onValueChanged.AddListener(OnToggleValueChanged);
+        displayNameInput.onValueChanged.AddListener(OnInputValueChanged);
 
         // 초기 버튼 상태 설정
-        goButton.interactable = false;
-
-        // InputField 상태 로깅
-        Debug.Log("InputField interactable: " + displayNameInput.interactable);
-        Debug.Log("InputField readOnly: " + displayNameInput.readOnly);
+        UpdateGoButtonState();
     }
 
-    void Update()
+    void OnInputValueChanged(string value)
     {
-        // 매 프레임마다 InputField의 텍스트 로깅
-        Debug.Log("Current InputField text: " + displayNameInput.text);
+        UpdateGoButtonState();
     }
 
     void OnToggleValueChanged(bool isChecked)
     {
-        goButton.interactable = isChecked;
+        UpdateGoButtonState();
+    }
+
+    void UpdateGoButtonState()
+    {
+        int nameLength = displayNameInput.text.Length;
+        bool isValidLength = nameLength >= MIN_NAME_LENGTH && nameLength <= MAX_NAME_LENGTH;
+        goButton.interactable = isValidLength && agreementToggle.isOn;
+
+        if (!isValidLength)
+        {
+            statusText.text = $"Nickname must be between {MIN_NAME_LENGTH} and {MAX_NAME_LENGTH} characters.";
+        }
+        else
+        {
+            statusText.text = "";
+        }
     }
 
     void OnGoButtonClick()
     {
         string displayName = displayNameInput.text;
+
         if (string.IsNullOrEmpty(displayName))
         {
             statusText.text = "Please enter a display name.";
+            return;
+        }
+
+        if (displayName.Length < MIN_NAME_LENGTH || displayName.Length > MAX_NAME_LENGTH)
+        {
+            statusText.text = $"Nickname must be between {MIN_NAME_LENGTH} and {MAX_NAME_LENGTH} characters.";
             return;
         }
 
@@ -66,7 +88,7 @@ public class DisplayNameCreator : MonoBehaviour
                 Debug.LogError(error.GenerateErrorReport());
                 if (error.Error == PlayFabErrorCode.NameNotAvailable)
                 {
-                    statusText.text = "This DisplayName is already taken. Please try another.";
+                    statusText.text = "This Nickname is already taken. Please try another.";
                 }
                 else
                 {
