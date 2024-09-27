@@ -1,31 +1,57 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RocketAccelerator : MonoBehaviour
+public class RocketItemButtonAccelerator : MonoBehaviour
 {
-    public Button accelerateButton;
-    public float accelerationForceUp = 10f;
-    public float accelerationForceRight = 5f;
-    public float accelerationDuration = 3f;
-    public int maxClickCount = 3;
-    private Rigidbody2D rocketRigidbody;
+    public GameObject ballObject;
+    public Button rocketItemButton;
+    public Text itemCountText;
+    public float accelerationForceX = 10f;
+    public float accelerationForceY = 5f;
+    public float accelerationDuration = 2f;
+    public float activationX = 10f;
+    public int maxUsageCount = 3;
+
+    // BallSpeedManager 참조 추가
+    public BallSpeedManager ballSpeedManager;
+
+    private Rigidbody2D ballRigidbody;
     private bool isAccelerating = false;
     private float accelerationTimer = 0f;
-    private int clickCount = 0;
-    private float lastAccelerationTime = 0f;
-    public float accelerationCooldown = 0.5f; // 연속 가속 방지를 위한 쿨다운
+    private int remainingUses;
 
     void Start()
     {
-        rocketRigidbody = GetComponent<Rigidbody2D>();
-        
-        // 버튼을 화면 하단에 배치
-        accelerateButton.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f, 0);
-        accelerateButton.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f, 0);
-        accelerateButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 50);
-        accelerateButton.onClick.AddListener(TryStartAcceleration);
-        
-        UpdateButtonInteractable();
+        if (ballObject == null)
+        {
+            Debug.LogError("Ball object is not assigned!");
+            return;
+        }
+        ballRigidbody = ballObject.GetComponent<Rigidbody2D>();
+        if (ballRigidbody == null)
+        {
+            Debug.LogError("Rigidbody2D component not found on the ball object!");
+            return;
+        }
+        if (rocketItemButton == null)
+        {
+            Debug.LogError("Rocket Item Button is not assigned!");
+            return;
+        }
+
+        // BallSpeedManager 찾기
+        if (ballSpeedManager == null)
+        {
+            ballSpeedManager = FindObjectOfType<BallSpeedManager>();
+            if (ballSpeedManager == null)
+            {
+                Debug.LogError("BallSpeedManager not found in the scene!");
+            }
+        }
+
+        rocketItemButton.onClick.AddListener(TryActivateRocketItem);
+        remainingUses = maxUsageCount;
+        UpdateUI();
     }
 
     void Update()
@@ -33,53 +59,97 @@ public class RocketAccelerator : MonoBehaviour
         if (isAccelerating)
         {
             accelerationTimer += Time.deltaTime;
-            if (accelerationTimer < accelerationDuration)
+            if (accelerationTimer >= accelerationDuration)
             {
-                // 로켓에 위쪽과 오른쪽 방향으로 힘을 가함
-                Vector2 force = new Vector2(accelerationForceRight, accelerationForceUp);
-                rocketRigidbody.AddForce(force);
-            }
-            else
-            {
-                // 가속 시간이 끝나면 가속 종료
-                isAccelerating = false;
-                accelerationTimer = 0f;
+                StopAcceleration();
             }
         }
-
-        // 터치 입력 감지
-        if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
-            if (touch.phase == TouchPhase.Began)
-            {
-                TryStartAcceleration();
-            }
-        }
-
-        // 마우스 클릭 감지 (에디터 및 데스크톱 플랫폼용)
-        if (Input.GetMouseButtonDown(0))
-        {
-            TryStartAcceleration();
-        }
-
-        UpdateButtonInteractable();
+        UpdateUI();
     }
 
-    void TryStartAcceleration()
+    void FixedUpdate()
     {
-        if (clickCount < maxClickCount && transform.position.x > 2f && Time.time - lastAccelerationTime > accelerationCooldown)
+        if (isAccelerating)
         {
-            isAccelerating = true;
-            accelerationTimer = 0f;
-            clickCount++;
-            lastAccelerationTime = Time.time;
-            Debug.Log($"Acceleration activated. Clicks remaining: {maxClickCount - clickCount}");
+            Vector2 force = new Vector2(accelerationForceX, accelerationForceY);
+            ballRigidbody.AddForce(force);
         }
     }
 
-    void UpdateButtonInteractable()
+    void TryActivateRocketItem()
     {
-        accelerateButton.interactable = (clickCount < maxClickCount) && (transform.position.x > 2f) && (Time.time - lastAccelerationTime > accelerationCooldown);
+        bool isGameOver = IsGameOver();
+        if (!isGameOver && !isAccelerating && ballObject.transform.position.x > activationX && remainingUses > 0)
+        {
+            StartAcceleration();
+            remainingUses--;
+        }
+        else if (isGameOver)
+        {
+            Debug.Log("Cannot activate rocket item. Game is over.");
+        }
+        else if (remainingUses <= 0)
+        {
+            Debug.Log("No more uses left for the rocket item.");
+        }
+        else if (ballObject.transform.position.x <= activationX)
+        {
+            Debug.Log("Cannot activate rocket item. Ball hasn't reached the activation point yet.");
+        }
+    }
+
+    void StartAcceleration()
+    {
+        isAccelerating = true;
+        accelerationTimer = 0f;
+        Debug.Log($"Rocket item activated! Ball is accelerating. Remaining uses: {remainingUses}");
+        UpdateUI();
+    }
+
+    void StopAcceleration()
+    {
+        isAccelerating = false;
+        accelerationTimer = 0f;
+        Debug.Log("Acceleration finished.");
+        UpdateUI();
+    }
+
+    void UpdateUI()
+    {
+        bool isGameOver = IsGameOver();
+        bool isBallPastActivationPoint = ballObject != null && ballObject.transform.position.x > activationX;
+        bool hasRemainingUses = remainingUses > 0;
+
+        bool canUse = !isGameOver && !isAccelerating && isBallPastActivationPoint && hasRemainingUses;
+
+        if (rocketItemButton != null)
+        {
+            rocketItemButton.interactable = canUse;
+        }
+
+        if (itemCountText != null)
+        {
+            itemCountText.text = $"{remainingUses}";
+        }
+    }
+
+    bool IsGameOver()
+    {
+        return ballSpeedManager != null && ballSpeedManager.gameOver;
+    }
+
+    void OnEnable()
+    {
+        InvokeRepeating("LogStatus", 0f, 1f);
+    }
+
+    void OnDisable()
+    {
+        CancelInvoke("LogStatus");
+    }
+
+    void LogStatus()
+    {
+       
     }
 }

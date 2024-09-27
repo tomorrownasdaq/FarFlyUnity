@@ -4,16 +4,17 @@ using System.Collections.Generic;
 using TMPro;
 using System;
 using PlayFab;
-using PlayFab.ClientModels;
+using PlayFab.EconomyModels;
+using PlayFab.ClientModels;  // 추가된 네임스페이스
 
 public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
 {
     private const string DIAMOND_PACK_ID = "dia10";
     private const string POWER_PACK_ID = "pw5";
     private const string GOLD_PACK_ID = "gd500";
-    private const string DIAMOND_CURRENCY_CODE = "DI";
-    private const string POWER_CURRENCY_CODE = "PW";
-    private const string GOLD_CURRENCY_CODE = "GL";
+    private const string DIAMOND_CURRENCY_ID = "DIA";
+    private const string POWER_CURRENCY_ID = "PW";
+    private const string GOLD_CURRENCY_ID = "GL";
 
     private int currentDiamonds = 0;
     private int currentPower = 0;
@@ -41,28 +42,23 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
 
     private void LoadInitialCurrencyCount()
     {
-        GetVirtualCurrencyBalance();
+        GetCurrencyBalances();
     }
 
-    private void GetVirtualCurrencyBalance()
+    public void GetCurrencyBalances()
     {
-        PlayFabClientAPI.GetUserInventory(new GetUserInventoryRequest(),
+        var request = new GetUserInventoryRequest();
+
+        PlayFabClientAPI.GetUserInventory(request,
             result => {
-                if (result.VirtualCurrency.TryGetValue(DIAMOND_CURRENCY_CODE, out int diamondBalance))
-                {
-                    currentDiamonds = diamondBalance;
-                    UpdateDiamondText();
-                }
-                if (result.VirtualCurrency.TryGetValue(POWER_CURRENCY_CODE, out int powerBalance))
-                {
-                    currentPower = powerBalance;
-                    UpdatePowerText();
-                }
-                if (result.VirtualCurrency.TryGetValue(GOLD_CURRENCY_CODE, out int goldBalance))
-                {
-                    currentGold = goldBalance;
-                    UpdateGoldText();
-                }
+                currentDiamonds = result.VirtualCurrency.ContainsKey(DIAMOND_CURRENCY_ID) ? result.VirtualCurrency[DIAMOND_CURRENCY_ID] : 0;
+                currentPower = result.VirtualCurrency.ContainsKey(POWER_CURRENCY_ID) ? result.VirtualCurrency[POWER_CURRENCY_ID] : 0;
+                currentGold = result.VirtualCurrency.ContainsKey(GOLD_CURRENCY_ID) ? result.VirtualCurrency[GOLD_CURRENCY_ID] : 0;
+
+                UpdateDiamondText();
+                UpdatePowerText();
+                UpdateGoldText();
+
                 Debug.Log($"PlayFab에서 화폐 잔액을 가져왔습니다: 다이아몬드 {currentDiamonds}, 파워 {currentPower}, 골드 {currentGold}");
             },
             error => {
@@ -126,7 +122,7 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
 
     public void OnInitializeFailed(InitializationFailureReason error, string message)
     {
-        string errorMessage = message ?? "No additional information provided.";
+        string errorMessage = message ?? "추가 정보가 제공되지 않았습니다.";
         Debug.LogError($"IAP 초기화 실패: {error}. 추가 정보: {errorMessage}");
     }
 
@@ -134,17 +130,17 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
     {
         if (string.Equals(args.purchasedProduct.definition.id, DIAMOND_PACK_ID, StringComparison.Ordinal))
         {
-            AddCurrencyToPlayFab(DIAMOND_CURRENCY_CODE, 10);
+            AddCurrencyToPlayFab(DIAMOND_CURRENCY_ID, 10);
             return PurchaseProcessingResult.Complete;
         }
         else if (string.Equals(args.purchasedProduct.definition.id, POWER_PACK_ID, StringComparison.Ordinal))
         {
-            AddCurrencyToPlayFab(POWER_CURRENCY_CODE, 5);
+            AddCurrencyToPlayFab(POWER_CURRENCY_ID, 5);
             return PurchaseProcessingResult.Complete;
         }
         else if (string.Equals(args.purchasedProduct.definition.id, GOLD_PACK_ID, StringComparison.Ordinal))
         {
-            AddCurrencyToPlayFab(GOLD_CURRENCY_CODE, 500);
+            AddCurrencyToPlayFab(GOLD_CURRENCY_ID, 500);
             return PurchaseProcessingResult.Complete;
         }
         else
@@ -159,35 +155,21 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
         Debug.LogError($"구매 실패: {product.definition.id}, 이유: {failureReason}");
     }
 
-    private void AddCurrencyToPlayFab(string currencyCode, int amount)
+    private void AddCurrencyToPlayFab(string currencyId, int amount)
     {
         var request = new AddUserVirtualCurrencyRequest
         {
-            VirtualCurrency = currencyCode,
+            VirtualCurrency = currencyId,
             Amount = amount
         };
 
         PlayFabClientAPI.AddUserVirtualCurrency(request,
             result => {
-                switch (currencyCode)
-                {
-                    case DIAMOND_CURRENCY_CODE:
-                        currentDiamonds = result.Balance;
-                        UpdateDiamondText();
-                        break;
-                    case POWER_CURRENCY_CODE:
-                        currentPower = result.Balance;
-                        UpdatePowerText();
-                        break;
-                    case GOLD_CURRENCY_CODE:
-                        currentGold = result.Balance;
-                        UpdateGoldText();
-                        break;
-                }
-                Debug.Log($"{currencyCode} {amount}개 추가됨. 현재 잔액: {result.Balance}");
+                GetCurrencyBalances(); // 모든 잔액 새로고침
+                Debug.Log($"{currencyId} {amount}개 추가됨. 새 잔액: {result.Balance}");
             },
             error => {
-                Debug.LogError($"PlayFab {currencyCode} 추가 실패: {error.ErrorMessage}");
+                Debug.LogError($"PlayFab {currencyId} 추가 실패: {error.ErrorMessage}");
             }
         );
     }
@@ -208,7 +190,7 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
     {
         if (PowerText != null)
         {
-            PowerText.text = $"{currentPower}";
+            PowerText.text = $"{currentPower}/10";
         }
         else
         {

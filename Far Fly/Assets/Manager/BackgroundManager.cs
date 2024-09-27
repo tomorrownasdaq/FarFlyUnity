@@ -6,6 +6,8 @@ public class BackgroundManager : MonoBehaviour
     public GameObject ballObject;
     public GameObject backgroundPrefab;
     public int maxBackgroundCount = 3;
+    public float backgroundYOffset = 31200f; // Y축 오프셋을 조절할 수 있는 새로운 변수
+
     private float backgroundWidth;
     private List<GameObject> backgroundObjects = new List<GameObject>();
     private float lastBackgroundX;
@@ -17,20 +19,17 @@ public class BackgroundManager : MonoBehaviour
             Debug.LogError("Ball or Background Prefab not assigned in the inspector!");
             return;
         }
-
         CalculateBackgroundWidth();
-     
     }
 
     void FixedUpdate()
     {
         // Check if we need to spawn a new background
-        if (ballObject.transform.position.x > lastBackgroundX - backgroundWidth - 20f && ballObject.transform.position.x > 2 )
+        if (ballObject.transform.position.x > lastBackgroundX - backgroundWidth - 20f && ballObject.transform.position.x > 2)
         {
             SpawnBackground();
             Debug.Log(backgroundObjects.Count);
         }
-
         // Remove off-screen background objects
         if (backgroundObjects.Count > 2)
         {
@@ -43,13 +42,13 @@ public class BackgroundManager : MonoBehaviour
         }
     }
 
-
     void SpawnBackground()
     {
-        Vector3 spawnPosition = new Vector3(lastBackgroundX, -3f, 0.2f);
+        // Y 위치에 backgroundYOffset을 적용합니다.
+        Vector3 spawnPosition = new Vector3(lastBackgroundX+1000, backgroundYOffset, 0.2f);
         GameObject newBackground = Instantiate(backgroundPrefab, spawnPosition, Quaternion.identity);
         backgroundObjects.Add(newBackground);
-        lastBackgroundX = newBackground.transform.position.x + 2.7f * backgroundWidth;
+        lastBackgroundX = newBackground.transform.position.x + 30f * backgroundWidth;
     }
 
     void CalculateBackgroundWidth()
