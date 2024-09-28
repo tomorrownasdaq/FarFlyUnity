@@ -400,6 +400,8 @@
 "Assets/Manager/PlayFab/PlayFabDataSync.cs"
 "Assets/Manager/PlayFab/PlayFabLogin.cs"
 "Assets/Manager/PlayFab/PlayFabShopManager.cs"
+"Assets/Manager/PlayFab/ShopItemLogic.cs"
+"Assets/Manager/PlayFab/ShopItemPurchaser.cs"
 "Assets/Manager/PlayFab/ShopItemUI.cs"
 "Assets/Manager/PlayFab/StoreManager.cs"
 "Assets/Manager/PrivacyPolicyHyper.cs"

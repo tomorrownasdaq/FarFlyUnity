@@ -67,8 +67,9 @@ public class StoreManager : MonoBehaviour
                 string title = GetItemTitle(catalogItems[i]);
                 string price = GetItemPriceInfo(catalogItems[i]);
                 string imageUrl = GetItemImageUrl(catalogItems[i]);
-                Debug.Log($"Setting item info - Title: {title}, Price: {price}, ImageUrl: {imageUrl}");
-                shopItemUI.SetItemInfo(title, price, imageUrl);
+                string itemId = catalogItems[i].Id;
+                Debug.Log($"Setting item info - Title: {title}, Price: {price}, ImageUrl: {imageUrl}, ItemId: {itemId}");
+                shopItemUI.SetItemInfo(title, price, imageUrl, itemId);
                 StartCoroutine(LoadItemImage(shopItemUI, imageUrl));
             }
             else

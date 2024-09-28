@@ -1429,6 +1429,18 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 694829884091359455, guid: 4914f200f13048a4ab7766ae5ffdbc7b, type: 3}
   m_PrefabInstance: {fileID: 7506144092760333889}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &625162612
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 625162611}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a94e04bcc78ba314caeb2aecc8b72c60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &625286011
 GameObject:
   m_ObjectHideFlags: 0
@@ -4834,6 +4846,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 7506144092760333891}
     - target: {fileID: 7652953592339604863, guid: 4914f200f13048a4ab7766ae5ffdbc7b, type: 3}
+      propertyPath: goldBalanceText
+      value: 
+      objectReference: {fileID: 661713222}
+    - target: {fileID: 7652953592339604863, guid: 4914f200f13048a4ab7766ae5ffdbc7b, type: 3}
       propertyPath: confirmationText
       value: 
       objectReference: {fileID: 279909111}
@@ -4849,7 +4865,10 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 2354394440801315220, guid: 4914f200f13048a4ab7766ae5ffdbc7b, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 694829884091359455, guid: 4914f200f13048a4ab7766ae5ffdbc7b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 625162612}
   m_SourcePrefab: {fileID: 100100000, guid: 4914f200f13048a4ab7766ae5ffdbc7b, type: 3}
 --- !u!114 &7506144092760333890 stripped
 MonoBehaviour:
