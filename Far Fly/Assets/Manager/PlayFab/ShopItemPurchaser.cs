@@ -15,6 +15,7 @@ public class ShopItemPurchaser : MonoBehaviour
 
     private void Start()
     {
+        GetCurrencyBalances();
         uiComponent = GetComponent<ShopItemUI>();
         if (uiComponent == null)
         {
@@ -129,7 +130,7 @@ public class ShopItemPurchaser : MonoBehaviour
                 );
             },
             error => {
-                Debug.LogError($"아이템 구매 실패: {error.ErrorMessage}");
+                Debug.LogError($"아이템 구매 실패: ItemId: {itemId}, Amount: {price}, Error: {error.ErrorMessage}");
             }
         );
     }

@@ -11,14 +11,23 @@ public class ShopItemUI : MonoBehaviour
     public TextMeshProUGUI goldText;
     private ShopItemPurchaser purchaser;
 
-    private void Start()
+    private void Awake()
     {
         purchaser = GetComponent<ShopItemPurchaser>();
         if (purchaser == null)
         {
-            Debug.LogError("ShopItemPurchaser component not found!");
+            purchaser = gameObject.AddComponent<ShopItemPurchaser>();
+        }
+    }
+
+    private void Start()
+    {
+        if (purchaser == null)
+        {
+            Debug.LogError("ShopItemPurchaser component not found and could not be added!");
             return;
         }
+
         if (buyButton != null)
         {
             buyButton.onClick.AddListener(OnBuyButtonClicked);
@@ -27,6 +36,7 @@ public class ShopItemUI : MonoBehaviour
         {
             Debug.LogError("Buy button is not assigned in the ShopItemUI!");
         }
+
         purchaser.GetCurrencyBalances();
     }
 
