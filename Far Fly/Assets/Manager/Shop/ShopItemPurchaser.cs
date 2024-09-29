@@ -13,20 +13,40 @@ public class ShopItemPurchaser : MonoBehaviour
     private const string GOLD_CURRENCY_ID = "GL";
     private ShopItemUI uiComponent;
 
+    private void Awake()
+    {
+        Debug.Log($"ShopItemPurchaser Awake called for {gameObject.name}");
+    }
+
     private void Start()
     {
+        Debug.Log($"ShopItemPurchaser Start called for {gameObject.name}");
+        InitializeUIComponent();
+        GetPlayerId();
+    }
+
+    private void OnEnable()
+    {
+        Debug.Log($"ShopItemPurchaser OnEnable called for {gameObject.name}");
         GetCurrencyBalances();
+    }
+
+    private void InitializeUIComponent()
+    {
         uiComponent = GetComponent<ShopItemUI>();
         if (uiComponent == null)
         {
-            Debug.LogError("ShopItemUI component not found!");
-            return;
+            Debug.LogError($"ShopItemUI component not found on {gameObject.name}!");
         }
-        GetPlayerId();
+        else
+        {
+            Debug.Log($"ShopItemUI component found on {gameObject.name}");
+        }
     }
 
     public void SetItemInfo(string itemPrice, string id)
     {
+        Debug.Log($"SetItemInfo called for {gameObject.name}: Price={itemPrice}, ID={id}");
         itemId = id;
         if (int.TryParse(itemPrice, out int parsedPrice))
         {
@@ -34,7 +54,7 @@ public class ShopItemPurchaser : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"Failed to parse price: {itemPrice}");
+            Debug.LogWarning($"Failed to parse price: {itemPrice} for {gameObject.name}");
             price = 0;
         }
     }
@@ -43,13 +63,12 @@ public class ShopItemPurchaser : MonoBehaviour
     {
         if (string.IsNullOrEmpty(PlayFabSettings.staticPlayer.PlayFabId))
         {
-            Debug.LogError("PlayFabId is null or empty. Make sure the player is logged in.");
+            Debug.LogError($"PlayFabId is null or empty for {gameObject.name}. Make sure the player is logged in.");
             return;
         }
         playerId = PlayFabSettings.staticPlayer.PlayFabId;
-        Debug.Log($"Retrieved Master Player ID: {playerId}");
+        Debug.Log($"Retrieved Master Player ID for {gameObject.name}: {playerId}");
 
-        // Get Title Player Account ID
         var request = new GetPlayerCombinedInfoRequest
         {
             PlayFabId = playerId,
@@ -67,15 +86,15 @@ public class ShopItemPurchaser : MonoBehaviour
                     result.InfoResultPayload.AccountInfo.TitleInfo.TitlePlayerAccount != null)
                 {
                     titlePlayerAccountId = result.InfoResultPayload.AccountInfo.TitleInfo.TitlePlayerAccount.Id;
-                    Debug.Log($"Retrieved Title Player Account ID: {titlePlayerAccountId}");
+                    Debug.Log($"Retrieved Title Player Account ID for {gameObject.name}: {titlePlayerAccountId}");
                 }
                 else
                 {
-                    Debug.LogError("Failed to retrieve Title Player Account ID.");
+                    Debug.LogError($"Failed to retrieve Title Player Account ID for {gameObject.name}.");
                 }
             },
             error => {
-                Debug.LogError($"Error getting player info: {error.ErrorMessage}");
+                Debug.LogError($"Error getting player info for {gameObject.name}: {error.ErrorMessage}");
             }
         );
     }
@@ -89,7 +108,7 @@ public class ShopItemPurchaser : MonoBehaviour
     {
         if (string.IsNullOrEmpty(titlePlayerAccountId))
         {
-            Debug.LogError("Title Player Account ID is not set. Cannot purchase item.");
+            Debug.LogError($"Title Player Account ID is not set for {gameObject.name}. Cannot purchase item.");
             return;
         }
 
@@ -102,8 +121,8 @@ public class ShopItemPurchaser : MonoBehaviour
         PlayFabClientAPI.SubtractUserVirtualCurrency(subtractCurrencyRequest,
             subtractResult => {
                 int newBalance = subtractResult.Balance;
-                uiComponent.UpdateGoldText(newBalance);
-                Debug.Log($"골드 차감 성공. 새로운 잔액: {newBalance}");
+                UpdateUIGoldText(newBalance);
+                Debug.Log($"골드 차감 성공 for {gameObject.name}. 새로운 잔액: {newBalance}");
 
                 var addItemRequest = new AddInventoryItemsRequest
                 {
@@ -122,15 +141,15 @@ public class ShopItemPurchaser : MonoBehaviour
 
                 PlayFabEconomyAPI.AddInventoryItems(addItemRequest,
                     addItemResult => {
-                        Debug.Log($"아이템 {itemId}를 플레이어 {titlePlayerAccountId}의 인벤토리에 추가했습니다.");
+                        Debug.Log($"아이템 {itemId}를 플레이어 {titlePlayerAccountId}의 인벤토리에 추가했습니다. ({gameObject.name})");
                     },
                     addItemError => {
-                        Debug.LogError($"아이템을 인벤토리에 추가하는 데 실패했습니다: {addItemError.ErrorMessage}");
+                        Debug.LogError($"아이템을 인벤토리에 추가하는 데 실패했습니다 for {gameObject.name}: {addItemError.ErrorMessage}");
                     }
                 );
             },
             error => {
-                Debug.LogError($"아이템 구매 실패: ItemId: {itemId}, Amount: {price}, Error: {error.ErrorMessage}");
+                Debug.LogError($"아이템 구매 실패 for {gameObject.name}: ItemId: {itemId}, Amount: {price}, Error: {error.ErrorMessage}");
             }
         );
     }
@@ -141,12 +160,25 @@ public class ShopItemPurchaser : MonoBehaviour
         PlayFabClientAPI.GetUserInventory(request,
             result => {
                 int gold = result.VirtualCurrency.ContainsKey(GOLD_CURRENCY_ID) ? result.VirtualCurrency[GOLD_CURRENCY_ID] : 0;
-                uiComponent.UpdateGoldText(gold);
-                Debug.Log($"PlayFab에서 골드 잔액을 가져왔습니다: {gold}");
+                UpdateUIGoldText(gold);
+                Debug.Log($"PlayFab에서 골드 잔액을 가져왔습니다 for {gameObject.name}: {gold}");
             },
             error => {
-                Debug.LogError($"PlayFab에서 화폐 잔액을 가져오는 데 실패했습니다: {error.ErrorMessage}");
+                Debug.LogError($"PlayFab에서 화폐 잔액을 가져오는 데 실패했습니다 for {gameObject.name}: {error.ErrorMessage}");
             }
         );
+    }
+
+    private void UpdateUIGoldText(int goldAmount)
+    {
+        if (uiComponent != null)
+        {
+            uiComponent.UpdateGoldText(goldAmount);
+        }
+        else
+        {
+            Debug.LogWarning($"ShopItemUI component is null when trying to update gold text for {gameObject.name}");
+            InitializeUIComponent();
+        }
     }
 }
