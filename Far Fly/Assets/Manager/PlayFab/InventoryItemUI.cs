@@ -8,13 +8,10 @@ public class InventoryItemUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI itemNameText;
     [SerializeField] private Button selectButton;
     [SerializeField] private Image checkImage;
-
     private string itemId;
-    private bool isSelected = false;
 
     private void Start()
     {
-        selectButton.onClick.AddListener(ToggleSelection);
         checkImage.gameObject.SetActive(false);
     }
 
@@ -37,25 +34,18 @@ public class InventoryItemUI : MonoBehaviour
         }
     }
 
-    private void ToggleSelection()
+    public void SetSelected(bool selected)
     {
-        isSelected = !isSelected;
-        checkImage.gameObject.SetActive(isSelected);
-    }
-
-    public bool IsSelected()
-    {
-        return isSelected;
-    }
-
-    public void ResetSelection()
-    {
-        isSelected = false;
-        checkImage.gameObject.SetActive(false);
+        checkImage.gameObject.SetActive(selected);
     }
 
     public string GetItemId()
     {
         return itemId;
+    }
+
+    public Button GetSelectButton()
+    {
+        return selectButton;
     }
 }

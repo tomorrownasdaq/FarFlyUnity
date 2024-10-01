@@ -9,9 +9,9 @@ public class PlayFabInventoryManager : MonoBehaviour
     public GameObject inventoryItemPrefab;
     public Transform inventoryContent;
     public Button loadInventoryButton;
-
     private const string COLLECTION_ID = "inventory_ball";
     private Dictionary<string, InventoryItemUI> inventoryItems = new Dictionary<string, InventoryItemUI>();
+    private string lastSelectedItemId;
 
     private void Start()
     {
@@ -21,7 +21,6 @@ public class PlayFabInventoryManager : MonoBehaviour
 
     private void HideExistingItems()
     {
-        // Disable all child objects of inventoryContent
         foreach (Transform child in inventoryContent)
         {
             child.gameObject.SetActive(false);
@@ -48,12 +47,10 @@ public class PlayFabInventoryManager : MonoBehaviour
     private void OnGetInventoryItemsSuccess(GetInventoryItemsResponse result)
     {
         ClearInventory();
-
         foreach (var item in result.Items)
         {
             CreateInventoryItem(item);
         }
-
         if (result.Items.Count == 0)
         {
             Debug.Log($"No items found in the '{COLLECTION_ID}' collection.");
@@ -62,14 +59,12 @@ public class PlayFabInventoryManager : MonoBehaviour
 
     private void ClearInventory()
     {
-        // Destroy all existing inventory items
         foreach (var item in inventoryItems.Values)
         {
             Destroy(item.gameObject);
         }
         inventoryItems.Clear();
-
-        // Hide any remaining items in the content
+        lastSelectedItemId = null;
         HideExistingItems();
     }
 
@@ -78,26 +73,38 @@ public class PlayFabInventoryManager : MonoBehaviour
         GameObject newItem = Instantiate(inventoryItemPrefab, inventoryContent);
         InventoryItemUI itemUI = newItem.GetComponent<InventoryItemUI>();
         inventoryItems[item.Id] = itemUI;
-
-        // Ensure the new item is active
         newItem.SetActive(true);
+
+        itemUI.GetSelectButton().onClick.AddListener(() => SelectItem(item.Id));
 
         var request = new GetItemRequest
         {
             Id = item.Id,
             AlternateId = null
         };
-
         PlayFabEconomyAPI.GetItem(request, result =>
         {
             string itemName = GetItemName(result.Item);
             itemUI.SetItemInfo(itemName, item.Id);
-
             if (result.Item?.Images != null && result.Item.Images.Count > 0)
             {
                 StartCoroutine(LoadItemImage(result.Item.Images[0].Url, itemUI));
             }
         }, OnError);
+    }
+
+    private void SelectItem(string itemId)
+    {
+        if (lastSelectedItemId != null && inventoryItems.ContainsKey(lastSelectedItemId))
+        {
+            inventoryItems[lastSelectedItemId].SetSelected(false);
+        }
+
+        lastSelectedItemId = itemId;
+        inventoryItems[itemId].SetSelected(true);
+
+        // 여기에 아이템 선택 시 추가적인 로직을 구현할 수 있습니다.
+        Debug.Log($"Selected item: {itemId}");
     }
 
     private string GetItemName(CatalogItem item)
