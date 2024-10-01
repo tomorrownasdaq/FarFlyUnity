@@ -136,7 +136,7 @@ public class ShopItemPurchaser : MonoBehaviour
                         Id = itemId,
                     },
                     Amount = 1,
-                    CollectionId = "inventory"
+                    CollectionId = "inventory_ball"
                 };
 
                 PlayFabEconomyAPI.AddInventoryItems(addItemRequest,
