@@ -5501,8 +5501,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inventoryItemPrefab: {fileID: 973588411}
   inventoryContent: {fileID: 784132412}
-  searchInputField: {fileID: 0}
-  searchButton: {fileID: 0}
+  loadInventoryButton: {fileID: 1547642327}
 --- !u!114 &942105283636308431 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 365208728308107657, guid: b5c1a13f1c5fb594e9b775917cf245b1, type: 3}

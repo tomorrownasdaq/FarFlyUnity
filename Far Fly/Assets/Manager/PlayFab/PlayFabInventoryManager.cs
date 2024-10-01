@@ -1,24 +1,43 @@
 using UnityEngine;
 using PlayFab;
-using PlayFab.ClientModels;
+using PlayFab.EconomyModels;
 using System.Collections.Generic;
 using UnityEngine.UI;
-using TMPro;
 
 public class PlayFabInventoryManager : MonoBehaviour
 {
     public GameObject inventoryItemPrefab;
     public Transform inventoryContent;
-    
+    public Button loadInventoryButton;
 
+    private const string COLLECTION_ID = "inventory_ball";
     private Dictionary<string, InventoryItemUI> inventoryItems = new Dictionary<string, InventoryItemUI>();
 
     private void Start()
     {
+        loadInventoryButton.onClick.AddListener(GetInventoryItems);
+        HideExistingItems();
+    }
+
+    private void HideExistingItems()
+    {
+        // Disable all child objects of inventoryContent
+        foreach (Transform child in inventoryContent)
+        {
+            child.gameObject.SetActive(false);
+        }
+    }
+
+    private void GetInventoryItems()
+    {
         if (PlayFabClientAPI.IsClientLoggedIn())
         {
-            GetInventoryItems();
-            
+            var request = new GetInventoryItemsRequest
+            {
+                Count = 50,
+                CollectionId = COLLECTION_ID
+            };
+            PlayFabEconomyAPI.GetInventoryItems(request, OnGetInventoryItemsSuccess, OnError);
         }
         else
         {
@@ -26,40 +45,68 @@ public class PlayFabInventoryManager : MonoBehaviour
         }
     }
 
-    private void GetInventoryItems()
+    private void OnGetInventoryItemsSuccess(GetInventoryItemsResponse result)
     {
-        PlayFabClientAPI.GetUserInventory(new GetUserInventoryRequest(), OnGetUserInventorySuccess, OnError);
-    }
+        ClearInventory();
 
-    private void OnGetUserInventorySuccess(GetUserInventoryResult result)
-    {
-        foreach (var item in result.Inventory)
+        foreach (var item in result.Items)
         {
-            CreateOrUpdateInventoryItem(item);
+            CreateInventoryItem(item);
+        }
+
+        if (result.Items.Count == 0)
+        {
+            Debug.Log($"No items found in the '{COLLECTION_ID}' collection.");
         }
     }
 
-    private void CreateOrUpdateInventoryItem(ItemInstance item)
+    private void ClearInventory()
     {
-        if (!inventoryItems.ContainsKey(item.ItemId))
+        // Destroy all existing inventory items
+        foreach (var item in inventoryItems.Values)
         {
-            GameObject newItem = Instantiate(inventoryItemPrefab, inventoryContent);
-            InventoryItemUI itemUI = newItem.GetComponent<InventoryItemUI>();
-            inventoryItems[item.ItemId] = itemUI;
+            Destroy(item.gameObject);
         }
+        inventoryItems.Clear();
 
-        InventoryItemUI currentItemUI = inventoryItems[item.ItemId];
-        currentItemUI.SetItemInfo(item.DisplayName, item.ItemId);
+        // Hide any remaining items in the content
+        HideExistingItems();
+    }
 
-        // 아이템 이미지 로드 (아이템 카탈로그에서 이미지 URL을 가져온다고 가정)
-        PlayFabClientAPI.GetCatalogItems(new GetCatalogItemsRequest(), result =>
+    private void CreateInventoryItem(InventoryItem item)
+    {
+        GameObject newItem = Instantiate(inventoryItemPrefab, inventoryContent);
+        InventoryItemUI itemUI = newItem.GetComponent<InventoryItemUI>();
+        inventoryItems[item.Id] = itemUI;
+
+        // Ensure the new item is active
+        newItem.SetActive(true);
+
+        var request = new GetItemRequest
         {
-            CatalogItem catalogItem = result.Catalog.Find(x => x.ItemId == item.ItemId);
-            if (catalogItem != null && !string.IsNullOrEmpty(catalogItem.ItemImageUrl))
+            Id = item.Id,
+            AlternateId = null
+        };
+
+        PlayFabEconomyAPI.GetItem(request, result =>
+        {
+            string itemName = GetItemName(result.Item);
+            itemUI.SetItemInfo(itemName, item.Id);
+
+            if (result.Item?.Images != null && result.Item.Images.Count > 0)
             {
-                StartCoroutine(LoadItemImage(catalogItem.ItemImageUrl, currentItemUI));
+                StartCoroutine(LoadItemImage(result.Item.Images[0].Url, itemUI));
             }
         }, OnError);
+    }
+
+    private string GetItemName(CatalogItem item)
+    {
+        if (item?.Title != null && item.Title.ContainsKey("NEUTRAL"))
+        {
+            return item.Title["NEUTRAL"];
+        }
+        return "Unknown Item";
     }
 
     private System.Collections.IEnumerator LoadItemImage(string imageUrl, InventoryItemUI itemUI)
@@ -67,7 +114,6 @@ public class PlayFabInventoryManager : MonoBehaviour
         using (UnityEngine.Networking.UnityWebRequest request = UnityEngine.Networking.UnityWebRequestTexture.GetTexture(imageUrl))
         {
             yield return request.SendWebRequest();
-
             if (request.result == UnityEngine.Networking.UnityWebRequest.Result.Success)
             {
                 Texture2D texture = ((UnityEngine.Networking.DownloadHandlerTexture)request.downloadHandler).texture;
@@ -79,8 +125,6 @@ public class PlayFabInventoryManager : MonoBehaviour
             }
         }
     }
-
-    
 
     private void OnError(PlayFabError error)
     {
