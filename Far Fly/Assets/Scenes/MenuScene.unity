@@ -1755,7 +1755,7 @@ GameObject:
   - component: {fileID: 608176514}
   - component: {fileID: 608176513}
   m_Layer: 0
-  m_Name: DescriptionText (1)
+  m_Name: SpeedLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3069,11 +3069,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1221076220410551425, guid: 4914f200f13048a4ab7766ae5ffdbc7b, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1221076220410551425, guid: 4914f200f13048a4ab7766ae5ffdbc7b, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1221076220410551425, guid: 4914f200f13048a4ab7766ae5ffdbc7b, type: 3}
       propertyPath: m_SizeDelta.x
@@ -3085,11 +3085,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1221076220410551425, guid: 4914f200f13048a4ab7766ae5ffdbc7b, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 374.1656
       objectReference: {fileID: 0}
     - target: {fileID: 1221076220410551425, guid: 4914f200f13048a4ab7766ae5ffdbc7b, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -120.87945
       objectReference: {fileID: 0}
     - target: {fileID: 1841897081472602387, guid: 4914f200f13048a4ab7766ae5ffdbc7b, type: 3}
       propertyPath: m_text
@@ -3173,7 +3173,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5963141158630071045, guid: 4914f200f13048a4ab7766ae5ffdbc7b, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 241.75891
       objectReference: {fileID: 0}
     - target: {fileID: 5963141158630071045, guid: 4914f200f13048a4ab7766ae5ffdbc7b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -5513,7 +5513,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1831090020
 RectTransform:
   m_ObjectHideFlags: 0
