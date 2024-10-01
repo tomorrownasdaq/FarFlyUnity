@@ -3,6 +3,8 @@ using PlayFab;
 using PlayFab.EconomyModels;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using TMPro;
+using Newtonsoft.Json.Linq;
 
 public class PlayFabInventoryManager : MonoBehaviour
 {
@@ -84,8 +86,11 @@ public class PlayFabInventoryManager : MonoBehaviour
         };
         PlayFabEconomyAPI.GetItem(request, result =>
         {
+            Debug.Log($"GetItem response for ID {item.Id}: {JsonUtility.ToJson(result.Item)}");
             string itemName = GetItemName(result.Item);
-            itemUI.SetItemInfo(itemName, item.Id);
+            string accDescription = GetACCDescription(result.Item);
+            Debug.Log($"Setting item info - Name: {itemName}, ID: {item.Id}, ACC: {accDescription}");
+            itemUI.SetItemInfo(itemName, item.Id, accDescription);
             if (result.Item?.Images != null && result.Item.Images.Count > 0)
             {
                 StartCoroutine(LoadItemImage(result.Item.Images[0].Url, itemUI));
@@ -103,17 +108,44 @@ public class PlayFabInventoryManager : MonoBehaviour
         lastSelectedItemId = itemId;
         inventoryItems[itemId].SetSelected(true);
 
-        // 여기에 아이템 선택 시 추가적인 로직을 구현할 수 있습니다.
         Debug.Log($"Selected item: {itemId}");
     }
 
     private string GetItemName(CatalogItem item)
     {
+        Debug.Log($"GetItemName called with item: {JsonUtility.ToJson(item)}");
         if (item?.Title != null && item.Title.ContainsKey("NEUTRAL"))
         {
-            return item.Title["NEUTRAL"];
+            string title = item.Title["NEUTRAL"];
+            Debug.Log($"Found Title: {title}");
+            return title;
         }
+        Debug.Log("Title not found or NEUTRAL key missing");
         return "Unknown Item";
+    }
+
+    private string GetACCDescription(CatalogItem item)
+    {
+        if (item?.DisplayProperties != null)
+        {
+            var displayProperties = JObject.Parse(item.DisplayProperties.ToString());
+            Debug.Log($"DisplayProperties: {displayProperties}");
+            if (displayProperties.ContainsKey("ACC"))
+            {
+                string accDescription = displayProperties["ACC"].ToString();
+                Debug.Log($"Found ACC Description: {accDescription}");
+                return accDescription;
+            }
+            else
+            {
+                Debug.Log("ACC key not found in DisplayProperties");
+            }
+        }
+        else
+        {
+            Debug.Log("Item or DisplayProperties is null");
+        }
+        return "ACC 설명이 없습니다.";
     }
 
     private System.Collections.IEnumerator LoadItemImage(string imageUrl, InventoryItemUI itemUI)
