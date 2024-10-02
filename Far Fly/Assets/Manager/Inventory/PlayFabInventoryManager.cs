@@ -1,5 +1,6 @@
 using UnityEngine;
 using PlayFab;
+using PlayFab.ClientModels;
 using PlayFab.EconomyModels;
 using System.Collections.Generic;
 using UnityEngine.UI;
@@ -91,6 +92,7 @@ public class PlayFabInventoryManager : MonoBehaviour
             string accDescription = GetACCDescription(result.Item);
             Debug.Log($"Setting item info - Name: {itemName}, ID: {item.Id}, ACC: {accDescription}");
             itemUI.SetItemInfo(itemName, item.Id, accDescription);
+
             if (result.Item?.Images != null && result.Item.Images.Count > 0)
             {
                 StartCoroutine(LoadItemImage(result.Item.Images[0].Url, itemUI));
@@ -109,11 +111,51 @@ public class PlayFabInventoryManager : MonoBehaviour
         inventoryItems[itemId].SetSelected(true);
 
         Debug.Log($"Selected item: {itemId}");
+
+        // 선택된 아이템의 데이터를 업데이트
+        UpdateSelectedItemData(itemId);
     }
 
-    private string GetItemName(CatalogItem item)
+    private void UpdateSelectedItemData(string itemId)
     {
-        Debug.Log($"GetItemName called with item: {JsonUtility.ToJson(item)}");
+        if (inventoryItems.TryGetValue(itemId, out InventoryItemUI itemUI))
+        {
+            var request = new PlayFab.EconomyModels.GetItemRequest
+            {
+                Id = itemId,
+                AlternateId = null
+            };
+
+            PlayFabEconomyAPI.GetItem(request, result =>
+            {
+                string accDescription = GetACCDescription(result.Item);
+                SaveItemDataToUserData(itemId, accDescription);
+            }, OnError);
+        }
+        else
+        {
+            Debug.LogError($"Selected item with ID {itemId} not found in inventory items.");
+        }
+    }
+
+    private void SaveItemDataToUserData(string itemId, string accDescription)
+    {
+        var request = new PlayFab.ClientModels.UpdateUserDataRequest
+        {
+            Data = new Dictionary<string, string>
+            {
+                { "ACC", accDescription }
+            }
+        };
+
+        PlayFabClientAPI.UpdateUserData(request,
+            result => { Debug.Log($"Successfully updated ACC description for item {itemId} in User Data"); },
+            error => { Debug.LogError($"Failed to update ACC description: {error.ErrorMessage}"); }
+        );
+    }
+
+    private string GetItemName(PlayFab.EconomyModels.CatalogItem item)
+    {
         if (item?.Title != null && item.Title.ContainsKey("NEUTRAL"))
         {
             string title = item.Title["NEUTRAL"];
@@ -124,7 +166,7 @@ public class PlayFabInventoryManager : MonoBehaviour
         return "Unknown Item";
     }
 
-    private string GetACCDescription(CatalogItem item)
+    private string GetACCDescription(PlayFab.EconomyModels.CatalogItem item)
     {
         if (item?.DisplayProperties != null)
         {
@@ -169,4 +211,6 @@ public class PlayFabInventoryManager : MonoBehaviour
     {
         Debug.LogError($"PlayFab 오류: {error.ErrorMessage}");
     }
+
+    
 }
