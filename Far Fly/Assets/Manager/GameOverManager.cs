@@ -1,17 +1,25 @@
 using UnityEngine;
+using TMPro;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using PlayFab;
+using PlayFab.ClientModels;
 
 public class GameOverManager : MonoBehaviour
 {
     public static GameOverManager Instance { get; private set; }
-    [SerializeField] private GameObject gameOverPanelPrefab;
-    public string menuSceneName = "StageScene";
 
-    private GameObject gameOverPanelInstance;
-    private Text distanceText;
-    private Button menuButton;
-    private Canvas parentCanvas;
+    [Header("UI References")]
+    [SerializeField] private GameObject gameOverPanel;
+    [SerializeField] private TextMeshProUGUI distanceText;
+    [SerializeField] private TextMeshProUGUI goldRewardText;
+    [SerializeField] private TextMeshProUGUI diamondRewardText;
+    [SerializeField] private Button menuButton;
+
+    [Header("Settings")]
+    public string menuSceneName = "StageScene";
+    [SerializeField] private float goldMultiplier = 0.1f;
+    [SerializeField] private float diamondMultiplier = 0.01f;
 
     private void Awake()
     {
@@ -20,18 +28,6 @@ public class GameOverManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += OnSceneLoaded;
-
-            // 프리팹을 복제하여 보존
-            if (gameOverPanelPrefab != null)
-            {
-                gameOverPanelPrefab = Instantiate(gameOverPanelPrefab);
-                gameOverPanelPrefab.SetActive(false);
-                DontDestroyOnLoad(gameOverPanelPrefab);
-            }
-            else
-            {
-                Debug.LogError("Game Over Panel Prefab is not assigned in the inspector!");
-            }
         }
         else if (Instance != this)
         {
@@ -39,75 +35,23 @@ public class GameOverManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        SetupUI();
+    }
+
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (scene.name != menuSceneName)
         {
-            EnsureGameOverPanel();
             HideGameOverPanel();
-        }
-    }
-
-    private void EnsureGameOverPanel()
-    {
-        if (gameOverPanelPrefab == null)
-        {
-            Debug.LogError("Game Over Panel Prefab is null! It might have been destroyed.");
-            return;
-        }
-
-        if (gameOverPanelInstance == null)
-        {
-            CreateGameOverPanel();
-        }
-        else
-        {
-            SetupCanvasAndParent();
-        }
-    }
-
-    private void CreateGameOverPanel()
-    {
-        if (gameOverPanelPrefab != null)
-        {
-            gameOverPanelInstance = Instantiate(gameOverPanelPrefab);
-            DontDestroyOnLoad(gameOverPanelInstance);
-            SetupCanvasAndParent();
-            SetupUI();
-        }
-        else
-        {
-            Debug.LogError("Failed to create Game Over Panel: Prefab is null!");
-        }
-    }
-
-    private void SetupCanvasAndParent()
-    {
-        parentCanvas = FindObjectOfType<Canvas>();
-        if (parentCanvas == null)
-        {
-            GameObject canvasObject = new GameObject("MainCanvas");
-            parentCanvas = canvasObject.AddComponent<Canvas>();
-            parentCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvasObject.AddComponent<CanvasScaler>();
-            canvasObject.AddComponent<GraphicRaycaster>();
-        }
-
-        if (gameOverPanelInstance != null)
-        {
-            gameOverPanelInstance.transform.SetParent(parentCanvas.transform, false);
         }
     }
 
     private void SetupUI()
     {
-        if (gameOverPanelInstance == null) return;
-
-        distanceText = gameOverPanelInstance.GetComponentInChildren<Text>();
-        Button[] buttons = gameOverPanelInstance.GetComponentsInChildren<Button>(true);
-        if (buttons.Length >= 1)
+        if (menuButton != null)
         {
-            menuButton = buttons[0];
             menuButton.onClick.RemoveAllListeners();
             menuButton.onClick.AddListener(GoToMenu);
         }
@@ -115,24 +59,24 @@ public class GameOverManager : MonoBehaviour
 
     private void HideGameOverPanel()
     {
-        if (gameOverPanelInstance != null)
+        if (gameOverPanel != null)
         {
-            gameOverPanelInstance.SetActive(false);
+            gameOverPanel.SetActive(false);
         }
     }
 
     public void ShowGameOver(float distance)
     {
-        EnsureGameOverPanel();
-
-        if (gameOverPanelInstance != null)
+        if (gameOverPanel != null)
         {
             UpdateDistanceText(distance);
-            gameOverPanelInstance.SetActive(true);
+            UpdateRewardTexts(distance);
+            AddRewardsToServer(distance);
+            gameOverPanel.SetActive(true);
         }
         else
         {
-            Debug.LogError("Failed to create or find GameOverPanel!");
+            Debug.LogError("Game Over Panel is not assigned!");
         }
     }
 
@@ -144,6 +88,54 @@ public class GameOverManager : MonoBehaviour
         }
     }
 
+    private void UpdateRewardTexts(float distance)
+    {
+        int goldReward = Mathf.FloorToInt(distance * goldMultiplier);
+        int diamondReward = Mathf.FloorToInt(distance * diamondMultiplier);
+
+        if (goldRewardText != null)
+        {
+            goldRewardText.text = $"{goldReward}";
+        }
+
+        if (diamondRewardText != null)
+        {
+            diamondRewardText.text = $"{diamondReward}";
+        }
+    }
+
+    private void AddRewardsToServer(float distance)
+    {
+        int goldReward = Mathf.FloorToInt(distance * goldMultiplier);
+        int diamondReward = Mathf.FloorToInt(distance * diamondMultiplier);
+
+        var request = new AddUserVirtualCurrencyRequest
+        {
+            VirtualCurrency = "GL",
+            Amount = goldReward
+        };
+        PlayFabClientAPI.AddUserVirtualCurrency(request, OnAddGoldSuccess, OnAddCurrencyFailure);
+
+        request.VirtualCurrency = "DI";
+        request.Amount = diamondReward;
+        PlayFabClientAPI.AddUserVirtualCurrency(request, OnAddDiamondsSuccess, OnAddCurrencyFailure);
+    }
+
+    private void OnAddGoldSuccess(ModifyUserVirtualCurrencyResult result)
+    {
+        Debug.Log($"Successfully added {result.Balance} Gold to the player's account.");
+    }
+
+    private void OnAddDiamondsSuccess(ModifyUserVirtualCurrencyResult result)
+    {
+        Debug.Log($"Successfully added {result.Balance} Diamonds to the player's account.");
+    }
+
+    private void OnAddCurrencyFailure(PlayFabError error)
+    {
+        Debug.LogError($"Failed to add currency: {error.ErrorMessage}");
+    }
+
     private void GoToMenu()
     {
         HideGameOverPanel();
@@ -153,13 +145,5 @@ public class GameOverManager : MonoBehaviour
     private void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
-        if (gameOverPanelPrefab != null)
-        {
-            Destroy(gameOverPanelPrefab);
-        }
-        if (gameOverPanelInstance != null)
-        {
-            Destroy(gameOverPanelInstance);
-        }
     }
 }
