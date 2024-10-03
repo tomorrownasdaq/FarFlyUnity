@@ -11,6 +11,7 @@ public class BallManager : MonoBehaviour
     public float deceleration = 500f; // Default value
     public float maxXPosition = 100f; // Maximum x position for acceleration
     public float maxMapPosition = 100f; // Maximum x position for acceleration
+
     private Rigidbody2D rb;
     private float currentSpeed = 0f;
     private bool isAccelerating = false;
@@ -22,7 +23,6 @@ public class BallManager : MonoBehaviour
         {
             Debug.LogError("Rigidbody2D component is missing from the ball!");
         }
-
         // Load values from PlayFab when the game starts
         LoadValuesFromPlayFab();
     }
@@ -57,18 +57,9 @@ public class BallManager : MonoBehaviour
         else
         {
             // Decelerate
-            if (currentSpeed > 0)
-            {
-                currentSpeed = rb.velocity.x - deceleration * Time.fixedDeltaTime;
-                rb.velocity = new Vector2(currentSpeed, rb.velocity.y);
-            }
-            else
-            {
-                currentSpeed = rb.velocity.x + deceleration * Time.fixedDeltaTime;
-                rb.velocity = new Vector2(currentSpeed, rb.velocity.y);
-            }
+            currentSpeed = Mathf.MoveTowards(rb.velocity.x, 0, deceleration * Time.fixedDeltaTime);
+            rb.velocity = new Vector2(currentSpeed, rb.velocity.y);
         }
-
         // Reset acceleration flag
         isAccelerating = false;
     }
@@ -85,32 +76,73 @@ public class BallManager : MonoBehaviour
     // Load values from PlayFab
     void LoadValuesFromPlayFab()
     {
-        PlayFabClientAPI.GetUserData(new GetUserDataRequest(), OnDataReceived, OnError);
+        PlayFabClientAPI.GetTitleData(new GetTitleDataRequest(), OnTitleDataReceived, OnError);
     }
 
-    // Callback for when data is received from PlayFab
-    void OnDataReceived(GetUserDataResult result)
+    // Callback for when title data is received from PlayFab
+    void OnTitleDataReceived(GetTitleDataResult result)
+    {
+        if (result.Data != null && result.Data.ContainsKey("ACC"))
+        {
+            if (float.TryParse(result.Data["ACC"], out float loadedAccelerationRate))
+            {
+                accelerationRate = loadedAccelerationRate;
+                Debug.Log($"Loaded ACC value from PlayFab Title Data: {accelerationRate}");
+            }
+            else
+            {
+                Debug.LogWarning("Failed to parse ACC value from PlayFab Title Data.");
+            }
+        }
+        else
+        {
+            Debug.Log("ACC key not found in PlayFab Title Data. Checking Player Data...");
+            PlayFabClientAPI.GetUserData(new GetUserDataRequest(), OnPlayerDataReceived, OnError);
+        }
+
+        // Continue to load other values from User Data
+        PlayFabClientAPI.GetUserData(new GetUserDataRequest(), OnUserDataReceived, OnError);
+    }
+
+    // Callback for when player data is received from PlayFab
+    void OnPlayerDataReceived(GetUserDataResult result)
+    {
+        if (result.Data != null && result.Data.ContainsKey("ACC"))
+        {
+            if (float.TryParse(result.Data["ACC"].Value, out float loadedAccelerationRate))
+            {
+                accelerationRate = loadedAccelerationRate;
+                Debug.Log($"Loaded ACC value from PlayFab Player Data: {accelerationRate}");
+            }
+            else
+            {
+                Debug.LogWarning("Failed to parse ACC value from PlayFab Player Data. Using default value.");
+            }
+        }
+        else
+        {
+            Debug.Log("ACC key not found in PlayFab Player Data. Using default acceleration rate.");
+        }
+    }
+
+    // Callback for when user data is received from PlayFab
+    void OnUserDataReceived(GetUserDataResult result)
     {
         if (result.Data != null)
         {
-            if (result.Data.ContainsKey("AccelerationRate"))
-            {
-                if (float.TryParse(result.Data["AccelerationRate"].Value, out float loadedAccelerationRate))
-                {
-                    accelerationRate = loadedAccelerationRate;
-                }
-            }
             if (result.Data.ContainsKey("Deceleration"))
             {
                 if (float.TryParse(result.Data["Deceleration"].Value, out float loadedDeceleration))
                 {
                     deceleration = loadedDeceleration;
+                    Debug.Log($"Loaded Deceleration value from PlayFab User Data: {deceleration}");
                 }
             }
+            // You can add more user data checks here if needed
         }
         else
         {
-            Debug.Log("No data found in PlayFab. Using default values: AccelerationRate = 8000, Deceleration = 500");
+            Debug.Log("No User Data found in PlayFab. Using default values for other parameters.");
         }
     }
 
@@ -118,6 +150,6 @@ public class BallManager : MonoBehaviour
     void OnError(PlayFabError error)
     {
         Debug.LogError("PlayFab Error: " + error.GenerateErrorReport());
-        Debug.Log("Using default values: AccelerationRate = 8000, Deceleration = 500");
+        Debug.Log("Using default values due to PlayFab error.");
     }
 }
