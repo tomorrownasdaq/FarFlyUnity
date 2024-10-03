@@ -190,7 +190,7 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
     {
         if (PowerText != null)
         {
-            PowerText.text = $"{currentPower}/10";
+            PowerText.text = $"{currentPower}";
         }
         else
         {

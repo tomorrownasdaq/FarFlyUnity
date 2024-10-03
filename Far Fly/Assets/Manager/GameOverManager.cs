@@ -5,12 +5,11 @@ using UnityEngine.SceneManagement;
 public class GameOverManager : MonoBehaviour
 {
     public static GameOverManager Instance { get; private set; }
-    public GameObject gameOverPanelPrefab;
+    [SerializeField] private GameObject gameOverPanelPrefab;
     public string menuSceneName = "StageScene";
 
     private GameObject gameOverPanelInstance;
     private Text distanceText;
-    private Button retryButton;
     private Button menuButton;
     private Canvas parentCanvas;
 
@@ -20,67 +19,95 @@ public class GameOverManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            CreateGameOverPanel();
-            HideGameOverPanel();
+            SceneManager.sceneLoaded += OnSceneLoaded;
+
+            // 프리팹을 복제하여 보존
+            if (gameOverPanelPrefab != null)
+            {
+                gameOverPanelPrefab = Instantiate(gameOverPanelPrefab);
+                gameOverPanelPrefab.SetActive(false);
+                DontDestroyOnLoad(gameOverPanelPrefab);
+            }
+            else
+            {
+                Debug.LogError("Game Over Panel Prefab is not assigned in the inspector!");
+            }
         }
-        else
+        else if (Instance != this)
         {
             Destroy(gameObject);
         }
-    }
-
-    private void Start()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (scene.name != menuSceneName)
         {
-            if (gameOverPanelInstance == null)
-            {
-                CreateGameOverPanel();
-            }
+            EnsureGameOverPanel();
             HideGameOverPanel();
+        }
+    }
+
+    private void EnsureGameOverPanel()
+    {
+        if (gameOverPanelPrefab == null)
+        {
+            Debug.LogError("Game Over Panel Prefab is null! It might have been destroyed.");
+            return;
+        }
+
+        if (gameOverPanelInstance == null)
+        {
+            CreateGameOverPanel();
+        }
+        else
+        {
+            SetupCanvasAndParent();
         }
     }
 
     private void CreateGameOverPanel()
     {
-        if (gameOverPanelInstance == null)
+        if (gameOverPanelPrefab != null)
         {
             gameOverPanelInstance = Instantiate(gameOverPanelPrefab);
             DontDestroyOnLoad(gameOverPanelInstance);
-
-            parentCanvas = FindObjectOfType<Canvas>();
-            if (parentCanvas == null)
-            {
-                GameObject canvasObject = new GameObject("MainCanvas");
-                parentCanvas = canvasObject.AddComponent<Canvas>();
-                parentCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                canvasObject.AddComponent<CanvasScaler>();
-                canvasObject.AddComponent<GraphicRaycaster>();
-                DontDestroyOnLoad(canvasObject);
-            }
-
-            gameOverPanelInstance.transform.SetParent(parentCanvas.transform, false);
-
+            SetupCanvasAndParent();
             SetupUI();
-            gameOverPanelInstance.SetActive(false);
+        }
+        else
+        {
+            Debug.LogError("Failed to create Game Over Panel: Prefab is null!");
+        }
+    }
+
+    private void SetupCanvasAndParent()
+    {
+        parentCanvas = FindObjectOfType<Canvas>();
+        if (parentCanvas == null)
+        {
+            GameObject canvasObject = new GameObject("MainCanvas");
+            parentCanvas = canvasObject.AddComponent<Canvas>();
+            parentCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvasObject.AddComponent<CanvasScaler>();
+            canvasObject.AddComponent<GraphicRaycaster>();
+        }
+
+        if (gameOverPanelInstance != null)
+        {
+            gameOverPanelInstance.transform.SetParent(parentCanvas.transform, false);
         }
     }
 
     private void SetupUI()
     {
+        if (gameOverPanelInstance == null) return;
+
         distanceText = gameOverPanelInstance.GetComponentInChildren<Text>();
         Button[] buttons = gameOverPanelInstance.GetComponentsInChildren<Button>(true);
-        if (buttons.Length >= 2)
+        if (buttons.Length >= 1)
         {
-            retryButton = buttons[0];
-            menuButton = buttons[1];
-            retryButton.onClick.RemoveAllListeners();
-            retryButton.onClick.AddListener(RetryGame);
+            menuButton = buttons[0];
             menuButton.onClick.RemoveAllListeners();
             menuButton.onClick.AddListener(GoToMenu);
         }
@@ -92,32 +119,20 @@ public class GameOverManager : MonoBehaviour
         {
             gameOverPanelInstance.SetActive(false);
         }
-        if (retryButton != null)
-        {
-            retryButton.gameObject.SetActive(false);
-        }
-        if (menuButton != null)
-        {
-            menuButton.gameObject.SetActive(false);
-        }
     }
 
     public void ShowGameOver(float distance)
     {
-        if (gameOverPanelInstance == null)
-        {
-            CreateGameOverPanel();
-        }
-        UpdateDistanceText(distance);
-        gameOverPanelInstance.SetActive(true);
+        EnsureGameOverPanel();
 
-        if (retryButton != null)
+        if (gameOverPanelInstance != null)
         {
-            retryButton.gameObject.SetActive(true);
+            UpdateDistanceText(distance);
+            gameOverPanelInstance.SetActive(true);
         }
-        if (menuButton != null)
+        else
         {
-            menuButton.gameObject.SetActive(true);
+            Debug.LogError("Failed to create or find GameOverPanel!");
         }
     }
 
@@ -129,12 +144,6 @@ public class GameOverManager : MonoBehaviour
         }
     }
 
-    private void RetryGame()
-    {
-        HideGameOverPanel();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
-
     private void GoToMenu()
     {
         HideGameOverPanel();
@@ -144,5 +153,13 @@ public class GameOverManager : MonoBehaviour
     private void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
+        if (gameOverPanelPrefab != null)
+        {
+            Destroy(gameOverPanelPrefab);
+        }
+        if (gameOverPanelInstance != null)
+        {
+            Destroy(gameOverPanelInstance);
+        }
     }
 }

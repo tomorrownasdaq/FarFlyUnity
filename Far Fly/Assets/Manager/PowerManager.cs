@@ -7,19 +7,42 @@ using UnityEngine.SceneManagement;
 public class PowerManager : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI powerText;
+    [SerializeField] private GameObject powerNeedPanel; // Assign this in the inspector
     private const string POWER_CURRENCY_CODE = "PW";
+    private const int POWER_COST = 3;
 
     public void DecreasePower()
     {
         int currentPower = GetCurrentPowerAmount();
-        if (currentPower > 0)
+        if (currentPower >= POWER_COST)
         {
-            SubtractPower(1);
+            SubtractPower(POWER_COST);
             SceneManager.LoadScene("StageScene");
         }
         else
         {
-            Debug.Log("Not enough power to decrease.");
+            ShowPowerNeedPanel(POWER_COST - currentPower);
+        }
+    }
+
+    private void ShowPowerNeedPanel(int powerNeeded)
+    {
+        if (powerNeedPanel != null)
+        {
+            powerNeedPanel.SetActive(true);
+            TextMeshProUGUI messageText = powerNeedPanel.GetComponentInChildren<TextMeshProUGUI>();
+            if (messageText != null)
+            {
+                messageText.text = $"Need {powerNeeded} more power.";
+            }
+            else
+            {
+                Debug.LogWarning("Message text component not found in PowerNeedPanel.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("PowerNeedPanel is not assigned. Cannot show the panel.");
         }
     }
 
@@ -47,11 +70,9 @@ public class PowerManager : MonoBehaviour
             VirtualCurrency = POWER_CURRENCY_CODE,
             Amount = amount
         };
-
         Debug.Log($"Attempting to decrease power. Details:\n" +
                   $"Currency: {POWER_CURRENCY_CODE}\n" +
                   $"Amount: {amount}");
-
         PlayFabClientAPI.SubtractUserVirtualCurrency(request,
             result => {
                 Debug.Log($"Power decreased successfully. Details:\n" +
@@ -82,7 +103,6 @@ public class PowerManager : MonoBehaviour
         }
     }
 
-    // You might want to add a method to fetch the initial balance when the game starts
     private void FetchInitialBalance()
     {
         PlayFabClientAPI.GetUserInventory(new GetUserInventoryRequest(),
@@ -102,7 +122,6 @@ public class PowerManager : MonoBehaviour
         );
     }
 
-    // Call this method in Start() or when you need to initialize the power display
     private void Start()
     {
         FetchInitialBalance();
