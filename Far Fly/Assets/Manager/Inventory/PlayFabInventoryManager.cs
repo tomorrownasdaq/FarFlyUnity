@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
 using Newtonsoft.Json.Linq;
+using System.Collections;
 
 public class PlayFabInventoryManager : MonoBehaviour
 {
@@ -93,9 +94,10 @@ public class PlayFabInventoryManager : MonoBehaviour
             Debug.Log($"Setting item info - Name: {itemName}, ID: {item.Id}, ACC: {accDescription}");
             itemUI.SetItemInfo(itemName, item.Id, accDescription);
 
-            if (result.Item?.Images != null && result.Item.Images.Count > 0)
+            string imageUrl = GetItemImageUrl(result.Item);
+            if (!string.IsNullOrEmpty(imageUrl))
             {
-                StartCoroutine(LoadItemImage(result.Item.Images[0].Url, itemUI));
+                StartCoroutine(LoadItemImage(imageUrl, itemUI));
             }
         }, OnError);
     }
@@ -112,7 +114,6 @@ public class PlayFabInventoryManager : MonoBehaviour
 
         Debug.Log($"Selected item: {itemId}");
 
-        // 선택된 아이템의 데이터를 업데이트
         UpdateSelectedItemData(itemId);
     }
 
@@ -129,7 +130,8 @@ public class PlayFabInventoryManager : MonoBehaviour
             PlayFabEconomyAPI.GetItem(request, result =>
             {
                 string accDescription = GetACCDescription(result.Item);
-                SaveItemDataToUserData(itemId, accDescription);
+                string imageUrl = GetItemImageUrl(result.Item);
+                SaveItemDataToUserData(itemId, accDescription, imageUrl);
             }, OnError);
         }
         else
@@ -138,19 +140,21 @@ public class PlayFabInventoryManager : MonoBehaviour
         }
     }
 
-    private void SaveItemDataToUserData(string itemId, string accDescription)
+    private void SaveItemDataToUserData(string itemId, string accDescription, string imageUrl)
     {
         var request = new PlayFab.ClientModels.UpdateUserDataRequest
         {
             Data = new Dictionary<string, string>
             {
-                { "ACC", accDescription }
+                { "SelectedItemId", itemId },
+                { "ACC", accDescription },
+                { "ImageUrl", imageUrl }
             }
         };
 
         PlayFabClientAPI.UpdateUserData(request,
-            result => { Debug.Log($"Successfully updated ACC description for item {itemId} in User Data"); },
-            error => { Debug.LogError($"Failed to update ACC description: {error.ErrorMessage}"); }
+            result => { Debug.Log($"Successfully updated item data for item {itemId} in User Data"); },
+            error => { Debug.LogError($"Failed to update item data: {error.ErrorMessage}"); }
         );
     }
 
@@ -190,7 +194,16 @@ public class PlayFabInventoryManager : MonoBehaviour
         return "ACC 설명이 없습니다.";
     }
 
-    private System.Collections.IEnumerator LoadItemImage(string imageUrl, InventoryItemUI itemUI)
+    private string GetItemImageUrl(PlayFab.EconomyModels.CatalogItem item)
+    {
+        if (item?.Images != null && item.Images.Count > 0)
+        {
+            return item.Images[0].Url;
+        }
+        return "";
+    }
+
+    private IEnumerator LoadItemImage(string imageUrl, InventoryItemUI itemUI)
     {
         using (UnityEngine.Networking.UnityWebRequest request = UnityEngine.Networking.UnityWebRequestTexture.GetTexture(imageUrl))
         {
@@ -212,5 +225,27 @@ public class PlayFabInventoryManager : MonoBehaviour
         Debug.LogError($"PlayFab 오류: {error.ErrorMessage}");
     }
 
-    
+    // 선택된 아이템 데이터를 불러오는 메서드 (다른 스크립트에서 사용 가능)
+    public void LoadSelectedItemData(System.Action<string, string, string> onDataLoaded)
+    {
+        var request = new PlayFab.ClientModels.GetUserDataRequest();
+        PlayFabClientAPI.GetUserData(request, result =>
+        {
+            if (result.Data.TryGetValue("SelectedItemId", out var selectedItemId) &&
+                result.Data.TryGetValue("ACC", out var accDescription) &&
+                result.Data.TryGetValue("ImageUrl", out var imageUrl))
+            {
+                onDataLoaded(selectedItemId.Value, accDescription.Value, imageUrl.Value);
+            }
+            else
+            {
+                Debug.LogWarning("선택된 아이템 데이터를 찾을 수 없습니다.");
+                onDataLoaded(null, null, null);
+            }
+        }, error =>
+        {
+            Debug.LogError($"사용자 데이터를 불러오는 데 실패했습니다: {error.ErrorMessage}");
+            onDataLoaded(null, null, null);
+        });
+    }
 }

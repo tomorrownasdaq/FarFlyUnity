@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using PlayFab;
 using PlayFab.ClientModels;
+using UnityEngine.Networking;
 
 public class BallManager : MonoBehaviour
 {
-    public float accelerationRate = 8000f; // Default value
-    public float maxSpeed = 20f; // Maximum speed cap
-    public float deceleration = 500f; // Default value
-    public float maxXPosition = 100f; // Maximum x position for acceleration
-    public float maxMapPosition = 100f; // Maximum x position for acceleration
+    public float accelerationRate = 8000f;
+    public float maxSpeed = 20f;
+    public float deceleration = 500f;
+    public float maxXPosition = 100f;
+    public float maxMapPosition = 100f;
 
     private Rigidbody2D rb;
     private float currentSpeed = 0f;
     private bool isAccelerating = false;
+    private SpriteRenderer spriteRenderer;
+    private PlayFabInventoryManager inventoryManager;
 
     void Start()
     {
@@ -23,8 +26,21 @@ public class BallManager : MonoBehaviour
         {
             Debug.LogError("Rigidbody2D component is missing from the ball!");
         }
-        // Load values from PlayFab when the game starts
+
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer == null)
+        {
+            Debug.LogError("SpriteRenderer component is missing from the ball!");
+        }
+
+        inventoryManager = FindObjectOfType<PlayFabInventoryManager>();
+        if (inventoryManager == null)
+        {
+            Debug.LogError("PlayFabInventoryManager not found in the scene!");
+        }
+
         LoadValuesFromPlayFab();
+        LoadSelectedItemImage();
     }
 
     void Update()
@@ -73,13 +89,11 @@ public class BallManager : MonoBehaviour
         }
     }
 
-    // Load values from PlayFab
     void LoadValuesFromPlayFab()
     {
         PlayFabClientAPI.GetTitleData(new GetTitleDataRequest(), OnTitleDataReceived, OnError);
     }
 
-    // Callback for when title data is received from PlayFab
     void OnTitleDataReceived(GetTitleDataResult result)
     {
         if (result.Data != null && result.Data.ContainsKey("ACC"))
@@ -104,7 +118,6 @@ public class BallManager : MonoBehaviour
         PlayFabClientAPI.GetUserData(new GetUserDataRequest(), OnUserDataReceived, OnError);
     }
 
-    // Callback for when player data is received from PlayFab
     void OnPlayerDataReceived(GetUserDataResult result)
     {
         if (result.Data != null && result.Data.ContainsKey("ACC"))
@@ -125,7 +138,6 @@ public class BallManager : MonoBehaviour
         }
     }
 
-    // Callback for when user data is received from PlayFab
     void OnUserDataReceived(GetUserDataResult result)
     {
         if (result.Data != null)
@@ -146,10 +158,66 @@ public class BallManager : MonoBehaviour
         }
     }
 
-    // Error callback
     void OnError(PlayFabError error)
     {
         Debug.LogError("PlayFab Error: " + error.GenerateErrorReport());
         Debug.Log("Using default values due to PlayFab error.");
+    }
+
+    void LoadSelectedItemImage()
+    {
+        if (inventoryManager != null)
+        {
+            inventoryManager.LoadSelectedItemData((itemId, accDescription, imageUrl) =>
+            {
+                if (!string.IsNullOrEmpty(imageUrl))
+                {
+                    StartCoroutine(LoadImageFromUrl(imageUrl));
+                }
+                else
+                {
+                    Debug.LogWarning("No image URL found for the selected item.");
+                }
+
+                // ACC 값을 적용합니다 (선택적)
+                if (float.TryParse(accDescription, out float loadedAcc))
+                {
+                    accelerationRate = loadedAcc;
+                    Debug.Log($"Updated acceleration rate from selected item: {accelerationRate}");
+                }
+            });
+        }
+        else
+        {
+            Debug.LogError("PlayFabInventoryManager is not available.");
+        }
+    }
+
+    IEnumerator LoadImageFromUrl(string url)
+    {
+        using (UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(url))
+        {
+            yield return webRequest.SendWebRequest();
+
+            if (webRequest.result == UnityWebRequest.Result.Success)
+            {
+                Texture2D texture = DownloadHandlerTexture.GetContent(webRequest);
+                Sprite newSprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+
+                if (spriteRenderer != null)
+                {
+                    spriteRenderer.sprite = newSprite;
+                    Debug.Log("Successfully updated ball sprite with selected item image.");
+                }
+                else
+                {
+                    Debug.LogError("SpriteRenderer is null. Cannot apply the loaded image.");
+                }
+            }
+            else
+            {
+                Debug.LogError($"Failed to load image from URL: {webRequest.error}");
+            }
+        }
     }
 }
