@@ -6842,11 +6842,27 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 661713222}
     - target: {fileID: 365208728308107657, guid: b5c1a13f1c5fb594e9b775917cf245b1, type: 3}
+      propertyPath: goldText
+      value: 
+      objectReference: {fileID: 661713222}
+    - target: {fileID: 365208728308107657, guid: b5c1a13f1c5fb594e9b775917cf245b1, type: 3}
+      propertyPath: uiCanvas
+      value: 
+      objectReference: {fileID: 382487975}
+    - target: {fileID: 365208728308107657, guid: b5c1a13f1c5fb594e9b775917cf245b1, type: 3}
       propertyPath: PowerText
       value: 
       objectReference: {fileID: 661713223}
     - target: {fileID: 365208728308107657, guid: b5c1a13f1c5fb594e9b775917cf245b1, type: 3}
+      propertyPath: powerText
+      value: 
+      objectReference: {fileID: 661713223}
+    - target: {fileID: 365208728308107657, guid: b5c1a13f1c5fb594e9b775917cf245b1, type: 3}
       propertyPath: DiamondText
+      value: 
+      objectReference: {fileID: 661713221}
+    - target: {fileID: 365208728308107657, guid: b5c1a13f1c5fb594e9b775917cf245b1, type: 3}
+      propertyPath: diamondText
       value: 
       objectReference: {fileID: 661713221}
     - target: {fileID: 742655191353672732, guid: b5c1a13f1c5fb594e9b775917cf245b1, type: 3}

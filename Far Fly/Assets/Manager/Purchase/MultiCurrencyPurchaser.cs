@@ -12,7 +12,7 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
     private const string DIAMOND_PACK_ID = "dia10";
     private const string POWER_PACK_ID = "pw5";
     private const string GOLD_PACK_ID = "gd500";
-    private const string DIAMOND_CURRENCY_ID = "DIA";
+    private const string DIAMOND_CURRENCY_ID = "DI";
     private const string POWER_CURRENCY_ID = "PW";
     private const string GOLD_CURRENCY_ID = "GL";
 
@@ -28,6 +28,23 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
     private static IExtensionProvider storeExtensionProvider;
 
     [SerializeField] private float initializationDelay = 2f;
+
+    private void Awake()
+    {
+        ResetUIReferences();
+    }
+
+    private void OnEnable()
+    {
+        ResetUIReferences();
+    }
+
+    private void ResetUIReferences()
+    {
+        if (DiamondText == null) DiamondText = GameObject.Find("DiamondText")?.GetComponent<TextMeshProUGUI>();
+        if (PowerText == null) PowerText = GameObject.Find("PowerText")?.GetComponent<TextMeshProUGUI>();
+        if (GoldText == null) GoldText = GameObject.Find("GoldText")?.GetComponent<TextMeshProUGUI>();
+    }
 
     void Start()
     {

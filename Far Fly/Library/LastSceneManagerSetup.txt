@@ -1,5 +1,5 @@
 sceneSetups:
-- path: Assets/Feel/FeelDemos/Wheel/FeelWheel.unity
+- path: Assets/Scenes/Login.unity
   isLoaded: 1
   isActive: 1
   isSubScene: 0
