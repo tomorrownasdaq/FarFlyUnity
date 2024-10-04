@@ -2756,7 +2756,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6234475140753192845, guid: be33f260ce45e4cfaa62dc453f35135d, type: 3}
       propertyPath: m_Name
-      value: ResourceBar_Group_Demo
+      value: CurrencyPanel
       objectReference: {fileID: 0}
     - target: {fileID: 6234475141018809880, guid: be33f260ce45e4cfaa62dc453f35135d, type: 3}
       propertyPath: m_AnchorMax.y
@@ -2927,6 +2927,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &661713224 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6234475140753192845, guid: be33f260ce45e4cfaa62dc453f35135d, type: 3}
+  m_PrefabInstance: {fileID: 661713219}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &700351086
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6865,6 +6870,26 @@ PrefabInstance:
       propertyPath: diamondText
       value: 
       objectReference: {fileID: 661713221}
+    - target: {fileID: 365208728308107657, guid: b5c1a13f1c5fb594e9b775917cf245b1, type: 3}
+      propertyPath: GoldTextPath
+      value: Canvas/MainPanel/CurrencyPanel/Gold/GoldText
+      objectReference: {fileID: 0}
+    - target: {fileID: 365208728308107657, guid: b5c1a13f1c5fb594e9b775917cf245b1, type: 3}
+      propertyPath: PowerTextPath
+      value: Canvas/MainPanel/CurrencyPanel/Energy/PowerText
+      objectReference: {fileID: 0}
+    - target: {fileID: 365208728308107657, guid: b5c1a13f1c5fb594e9b775917cf245b1, type: 3}
+      propertyPath: DiamondTextPath
+      value: Canvas/MainPanel/CurrencyPanel/Diamond/DiamondText
+      objectReference: {fileID: 0}
+    - target: {fileID: 365208728308107657, guid: b5c1a13f1c5fb594e9b775917cf245b1, type: 3}
+      propertyPath: currencyUIParent
+      value: 
+      objectReference: {fileID: 661713224}
+    - target: {fileID: 365208728308107657, guid: b5c1a13f1c5fb594e9b775917cf245b1, type: 3}
+      propertyPath: initializationDelay
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 742655191353672732, guid: b5c1a13f1c5fb594e9b775917cf245b1, type: 3}
       propertyPath: m_Name
       value: PanelCode

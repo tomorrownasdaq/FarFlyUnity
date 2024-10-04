@@ -27,24 +27,7 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
     private static IStoreController storeController;
     private static IExtensionProvider storeExtensionProvider;
 
-    [SerializeField] private float initializationDelay = 2f;
-
-    private void Awake()
-    {
-        ResetUIReferences();
-    }
-
-    private void OnEnable()
-    {
-        ResetUIReferences();
-    }
-
-    private void ResetUIReferences()
-    {
-        if (DiamondText == null) DiamondText = GameObject.Find("DiamondText")?.GetComponent<TextMeshProUGUI>();
-        if (PowerText == null) PowerText = GameObject.Find("PowerText")?.GetComponent<TextMeshProUGUI>();
-        if (GoldText == null) GoldText = GameObject.Find("GoldText")?.GetComponent<TextMeshProUGUI>();
-    }
+    [SerializeField] private float initializationDelay = 0.5f;
 
     void Start()
     {

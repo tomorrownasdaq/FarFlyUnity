@@ -1,18 +1,15 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System;
 
 public class ShopItemUI : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI titleText;
-    [SerializeField] private TextMeshProUGUI priceText;
-    [SerializeField] private Image itemImage;
-    [SerializeField] private Button buyButton;
-    [SerializeField] private TextMeshProUGUI goldText;
-
+    public TextMeshProUGUI titleText;
+    public TextMeshProUGUI priceText;
+    public UnityEngine.UI.Image itemImage;
+    public Button buyButton;
+    public TextMeshProUGUI goldText;
     private ShopItemPurchaser purchaser;
-    private string itemId;
 
     private void Awake()
     {
@@ -32,38 +29,58 @@ public class ShopItemUI : MonoBehaviour
 
     private void InitializePurchaser()
     {
-        purchaser = GetComponent<ShopItemPurchaser>() ?? gameObject.AddComponent<ShopItemPurchaser>();
+        purchaser = GetComponent<ShopItemPurchaser>();
+        if (purchaser == null)
+        {
+            Debug.Log($"ShopItemPurchaser not found on {gameObject.name}, adding it.");
+            purchaser = gameObject.AddComponent<ShopItemPurchaser>();
+        }
 
         if (purchaser == null)
         {
             Debug.LogError($"Failed to add ShopItemPurchaser to {gameObject.name}!");
-            return;
         }
-
-        Debug.Log($"ShopItemPurchaser initialized on {gameObject.name}");
-        purchaser.GetCurrencyBalances();
+        else
+        {
+            Debug.Log($"ShopItemPurchaser initialized on {gameObject.name}");
+            purchaser.GetCurrencyBalances();
+        }
     }
 
     private void SetupBuyButton()
     {
-        if (buyButton == null)
+        if (buyButton != null)
+        {
+            buyButton.onClick.RemoveAllListeners();
+            buyButton.onClick.AddListener(OnBuyButtonClicked);
+        }
+        else
         {
             Debug.LogError($"Buy button is not assigned in the ShopItemUI for {gameObject.name}!");
-            return;
         }
-
-        buyButton.onClick.RemoveAllListeners();
-        buyButton.onClick.AddListener(OnBuyButtonClicked);
     }
 
-    public void SetItemInfo(string title, string itemPrice, string imageUrl, string id)
+    public void SetItemInfo(string title, string itemPrice, string imageUrl, string itemId)
     {
-        Debug.Log($"SetItemInfo called for {gameObject.name}: {title}, {itemPrice}, {id}");
+        Debug.Log($"SetItemInfo called for {gameObject.name}: {title}, {itemPrice}, {itemId}");
 
-        SetText(titleText, title, "Title");
-        SetText(priceText, itemPrice, "Price");
+        if (titleText != null)
+        {
+            titleText.text = title;
+        }
+        else
+        {
+            Debug.LogError($"Title Text is not assigned in the ShopItemUI for {gameObject.name}!");
+        }
 
-        itemId = id;
+        if (priceText != null)
+        {
+            priceText.text = itemPrice;
+        }
+        else
+        {
+            Debug.LogError($"Price Text is not assigned in the ShopItemUI for {gameObject.name}!");
+        }
 
         if (purchaser == null)
         {
@@ -71,57 +88,56 @@ public class ShopItemUI : MonoBehaviour
             InitializePurchaser();
         }
 
-        purchaser?.SetItemInfo(itemPrice, id);
+        if (purchaser != null)
+        {
+            purchaser.SetItemInfo(itemPrice, itemId);
+        }
+        else
+        {
+            Debug.LogError($"Failed to initialize ShopItemPurchaser in SetItemInfo for {gameObject.name}!");
+        }
 
         // Note: We're not using imageUrl here, but you might want to use it for loading the image
     }
 
-    private void SetText(TextMeshProUGUI textComponent, string value, string componentName)
+    public void SetItemImage(Texture2D texture)
     {
-        if (textComponent != null)
+        if (itemImage != null)
         {
-            textComponent.text = value;
+            if (texture != null)
+            {
+                Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                itemImage.sprite = sprite;
+                Debug.Log($"Item image set for {titleText?.text ?? "unknown item"} on {gameObject.name}");
+            }
+            else
+            {
+                Debug.LogWarning($"Received null texture for item image on {gameObject.name}");
+            }
         }
         else
         {
-            Debug.LogError($"{componentName} Text is not assigned in the ShopItemUI for {gameObject.name}!");
-        }
-    }
-
-    public void SetItemImage(Texture2D texture)
-    {
-        if (itemImage == null)
-        {
             Debug.LogError($"Item Image component is not assigned in the ShopItemUI for {gameObject.name}!");
-            return;
         }
-
-        if (texture == null)
-        {
-            Debug.LogWarning($"Received null texture for item image on {gameObject.name}");
-            return;
-        }
-
-        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-        itemImage.sprite = sprite;
-        Debug.Log($"Item image set for {titleText?.text ?? "unknown item"} on {gameObject.name}");
     }
 
     private void OnBuyButtonClicked()
     {
-        if (goldText == null || !int.TryParse(goldText.text, out int currentGold))
+        if (goldText != null && int.TryParse(goldText.text, out int currentGold))
+        {
+            if (purchaser != null && purchaser.CanAffordItem(currentGold))
+            {
+                ShowConfirmationDialog();
+            }
+            else
+            {
+                Debug.Log($"아이템 {titleText?.text ?? "unknown item"}을(를) 구매하기에 골드가 부족합니다.");
+            }
+        }
+        else
         {
             Debug.LogError($"현재 골드 금액을 파싱하는 데 실패했습니다. ({gameObject.name})");
-            return;
         }
-
-        if (purchaser == null || !purchaser.CanAffordItem(currentGold))
-        {
-            Debug.Log($"아이템 {titleText?.text ?? "unknown item"}을(를) 구매하기에 골드가 부족합니다.");
-            return;
-        }
-
-        ShowConfirmationDialog();
     }
 
     private void ShowConfirmationDialog()
@@ -134,37 +150,33 @@ public class ShopItemUI : MonoBehaviour
         }
 
         GameObject dialogInstance = Instantiate(dialogPrefab, transform.root);
-        ConfirmationDialog dialog = dialogInstance.GetComponent<ConfirmationDialog>();
-
-        if (dialog == null)
-        {
-            Debug.LogError($"ConfirmationDialog 컴포넌트를 찾을 수 없습니다. ({gameObject.name})");
-            Destroy(dialogInstance);
-            return;
-        }
-
-        dialog.SetMessage($"Buy {titleText.text} for {priceText.text} Gold?");
-        dialog.OnConfirm += ConfirmPurchase;
-        dialog.OnCancel += CancelPurchase;
-
         dialogInstance.SetActive(true);
-    }
 
-    private void ConfirmPurchase()
-    {
-        if (purchaser != null)
+        ConfirmationDialog dialog = dialogInstance.GetComponent<ConfirmationDialog>();
+        if (dialog != null)
         {
-            purchaser.PurchaseItem();
+            dialog.SetMessage($"Buy {titleText.text} for {priceText.text} Gold?");
+            dialog.OnConfirm += () => {
+                if (purchaser != null)
+                {
+                    purchaser.PurchaseItem();
+                }
+                else
+                {
+                    Debug.LogError($"ShopItemPurchaser is null when trying to purchase item on {gameObject.name}.");
+                }
+                Destroy(dialogInstance);
+            };
+            dialog.OnCancel += () => {
+                Debug.Log($"구매가 취소되었습니다: {titleText.text} on {gameObject.name}");
+                Destroy(dialogInstance);
+            };
         }
         else
         {
-            Debug.LogError($"ShopItemPurchaser is null when trying to purchase item on {gameObject.name}.");
+            Debug.LogError($"ConfirmationDialog 컴포넌트를 찾을 수 없습니다. ({gameObject.name})");
+            Destroy(dialogInstance);
         }
-    }
-
-    private void CancelPurchase()
-    {
-        Debug.Log($"구매가 취소되었습니다: {titleText.text} on {gameObject.name}");
     }
 
     public void UpdateGoldText(int amount)
