@@ -17,7 +17,7 @@ public class BallManager : MonoBehaviour
     private float currentSpeed = 0f;
     private bool isAccelerating = false;
     private SpriteRenderer spriteRenderer;
-    private PlayFabInventoryManager inventoryManager;
+    private StageInventoryManager inventoryManager;
 
     void Start()
     {
@@ -33,7 +33,7 @@ public class BallManager : MonoBehaviour
             Debug.LogError("SpriteRenderer component is missing from the ball!");
         }
 
-        inventoryManager = FindObjectOfType<PlayFabInventoryManager>();
+        inventoryManager = FindObjectOfType<StageInventoryManager>();
         if (inventoryManager == null)
         {
             Debug.LogError("PlayFabInventoryManager not found in the scene!");

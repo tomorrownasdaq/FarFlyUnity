@@ -23,37 +23,58 @@ public class GameOverManager : MonoBehaviour
 
     private void Awake()
     {
+        Debug.Log("GameOverManager Awake method called.");
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            // DontDestroyOnLoad 제거
             SceneManager.sceneLoaded += OnSceneLoaded;
+            Debug.Log("GameOverManager instance created.");
         }
         else if (Instance != this)
         {
+            Debug.Log("Duplicate GameOverManager instance destroyed.");
             Destroy(gameObject);
         }
     }
 
     private void Start()
     {
+        Debug.Log("GameOverManager Start method called.");
         SetupUI();
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        Debug.Log($"Scene loaded: {scene.name}");
         if (scene.name != menuSceneName)
         {
             HideGameOverPanel();
         }
+        SetupUI(); // UI 재설정 추가
     }
 
     private void SetupUI()
     {
+        Debug.Log("Setting up UI...");
+        if (gameOverPanel == null)
+        {
+            Debug.LogError("Game Over Panel is not assigned in the inspector!");
+        }
+        else
+        {
+            Debug.Log("Game Over Panel is correctly assigned.");
+        }
+
         if (menuButton != null)
         {
             menuButton.onClick.RemoveAllListeners();
             menuButton.onClick.AddListener(GoToMenu);
+            Debug.Log("Menu button listener set up.");
+        }
+        else
+        {
+            Debug.LogError("Menu Button is not assigned in the inspector!");
         }
     }
 
@@ -62,21 +83,31 @@ public class GameOverManager : MonoBehaviour
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(false);
+            Debug.Log("Game Over Panel hidden.");
+        }
+        else
+        {
+            Debug.LogWarning("Attempted to hide Game Over Panel, but it is not assigned.");
         }
     }
 
     public void ShowGameOver(float distance)
     {
+        Debug.Log($"ShowGameOver called with distance: {distance}");
         if (gameOverPanel != null)
         {
             UpdateDistanceText(distance);
             UpdateRewardTexts(distance);
             AddRewardsToServer(distance);
             gameOverPanel.SetActive(true);
+            Debug.Log("Game Over Panel shown.");
         }
         else
         {
-            Debug.LogError("Game Over Panel is not assigned!");
+            Debug.LogError("Game Over Panel is not assigned! Make sure to assign it in the Inspector.");
+            // 추가 디버그 정보
+            Debug.LogError($"GameOverManager instance: {(Instance != null ? "exists" : "null")}");
+            Debug.LogError($"This instance: {(this == Instance ? "is" : "is not")} the singleton instance");
         }
     }
 
@@ -85,6 +116,11 @@ public class GameOverManager : MonoBehaviour
         if (distanceText != null)
         {
             distanceText.text = $"Distance traveled: {distance:F2} units";
+            Debug.Log($"Distance text updated: {distanceText.text}");
+        }
+        else
+        {
+            Debug.LogWarning("Distance Text is not assigned.");
         }
     }
 
@@ -96,11 +132,21 @@ public class GameOverManager : MonoBehaviour
         if (goldRewardText != null)
         {
             goldRewardText.text = $"{goldReward}";
+            Debug.Log($"Gold reward text updated: {goldRewardText.text}");
+        }
+        else
+        {
+            Debug.LogWarning("Gold Reward Text is not assigned.");
         }
 
         if (diamondRewardText != null)
         {
             diamondRewardText.text = $"{diamondReward}";
+            Debug.Log($"Diamond reward text updated: {diamondRewardText.text}");
+        }
+        else
+        {
+            Debug.LogWarning("Diamond Reward Text is not assigned.");
         }
     }
 
@@ -119,6 +165,8 @@ public class GameOverManager : MonoBehaviour
         request.VirtualCurrency = "DI";
         request.Amount = diamondReward;
         PlayFabClientAPI.AddUserVirtualCurrency(request, OnAddDiamondsSuccess, OnAddCurrencyFailure);
+
+        Debug.Log($"Attempting to add rewards to server: Gold: {goldReward}, Diamonds: {diamondReward}");
     }
 
     private void OnAddGoldSuccess(ModifyUserVirtualCurrencyResult result)
@@ -138,12 +186,14 @@ public class GameOverManager : MonoBehaviour
 
     private void GoToMenu()
     {
+        Debug.Log("GoToMenu called.");
         HideGameOverPanel();
         SceneManager.LoadScene(menuSceneName);
     }
 
     private void OnDestroy()
     {
+        Debug.Log("GameOverManager OnDestroy called.");
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 }
