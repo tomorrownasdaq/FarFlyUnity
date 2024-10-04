@@ -115,7 +115,7 @@ public class GameOverManager : MonoBehaviour
     {
         if (distanceText != null)
         {
-            distanceText.text = $"Distance traveled: {distance:F2} units";
+            distanceText.text = $"Distance : {distance:F2} m";
             Debug.Log($"Distance text updated: {distanceText.text}");
         }
         else

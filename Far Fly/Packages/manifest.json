@@ -1,8 +1,10 @@
 {
   "dependencies": {
     "com.unity.2d.sprite": "1.0.0",
+    "com.unity.cinemachine": "3.1.1",
     "com.unity.device-simulator.devices": "1.0.0",
     "com.unity.feature.2d": "2.0.1",
+    "com.unity.postprocessing": "3.4.0",
     "com.unity.purchasing": "4.12.2",
     "com.unity.textmeshpro": "3.0.9",
     "com.unity.ugui": "1.0.0",

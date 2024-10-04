@@ -794,7 +794,7 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: ENABLE_PLAYFABSERVER_API
+    Android: ENABLE_PLAYFABSERVER_API;MOREMOUNTAINS_NICEVIBRATIONS_INSTALLED
     EmbeddedLinux: 
     GameCoreScarlett: 
     GameCoreXboxOne: 
