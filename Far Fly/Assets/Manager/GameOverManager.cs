@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -161,6 +162,7 @@ public class GameOverManager : MonoBehaviour
             UpdateRewardTexts(distance);
             gameOverPanel.SetActive(true);
             Debug.Log("Game Over Panel shown.");
+            SubmitScoreToLeaderboard(distance);
         }
         else
         {
@@ -168,6 +170,33 @@ public class GameOverManager : MonoBehaviour
             Debug.LogError($"GameOverManager instance: {(Instance != null ? "exists" : "null")}");
             Debug.LogError($"This instance: {(this == Instance ? "is" : "is not")} the singleton instance");
         }
+    }
+
+
+    private void SubmitScoreToLeaderboard(float distance)
+    {
+        var request = new UpdatePlayerStatisticsRequest
+        {
+            Statistics = new List<StatisticUpdate>
+            {
+                new StatisticUpdate
+                {
+                    StatisticName = "Distance",
+                    Value = Mathf.RoundToInt(distance)
+                }
+            }
+        };
+        PlayFabClientAPI.UpdatePlayerStatistics(request, OnLeaderboardUpdate, OnLeaderboardUpdateFailure);
+    }
+
+    private void OnLeaderboardUpdate(UpdatePlayerStatisticsResult result)
+    {
+        Debug.Log("Successfully submitted score to the leaderboard");
+    }
+
+    private void OnLeaderboardUpdateFailure(PlayFabError error)
+    {
+        Debug.LogError($"Failed to submit score to leaderboard: {error.ErrorMessage}");
     }
 
     private void UpdateDistanceText(float distance)
