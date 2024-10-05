@@ -9,6 +9,7 @@ public class PowerRechargeTimer : MonoBehaviour
     [SerializeField] private TextMeshProUGUI timerText;
     private const string POWER_CURRENCY_CODE = "PW";
     private DateTime nextRechargeTime;
+    private int currentPowerValue;
 
     private void Start()
     {
@@ -25,6 +26,17 @@ public class PowerRechargeTimer : MonoBehaviour
                     nextRechargeTime = rechargeTime.SecondsToRecharge > 0
                         ? DateTime.Now.AddSeconds(rechargeTime.SecondsToRecharge)
                         : DateTime.Now;
+
+                    // Store the current power value
+                    if (result.VirtualCurrency.TryGetValue(POWER_CURRENCY_CODE, out int powerValue))
+                    {
+                        currentPowerValue = powerValue;
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Power currency {POWER_CURRENCY_CODE} not found in inventory.");
+                    }
+
                     UpdateTimerDisplay();
                 }
                 else
@@ -40,15 +52,22 @@ public class PowerRechargeTimer : MonoBehaviour
 
     private void UpdateTimerDisplay()
     {
-        TimeSpan timeLeft = nextRechargeTime - DateTime.Now;
-        if (timeLeft.TotalSeconds > 0)
+        if (currentPowerValue >= 30)
         {
-            timerText.text = $"Next Power in: {timeLeft.Minutes:D2}:{timeLeft.Seconds:D2}";
+            timerText.text = "0:00";
         }
         else
         {
-            timerText.text = "Power Ready!";
-            FetchVirtualCurrencyRechargeTime(); // Refresh the recharge time
+            TimeSpan timeLeft = nextRechargeTime - DateTime.Now;
+            if (timeLeft.TotalSeconds > 0)
+            {
+                timerText.text = $"Next Power in: {timeLeft.Minutes:D2}:{timeLeft.Seconds:D2}";
+            }
+            else
+            {
+                timerText.text = "Power Ready!";
+                FetchVirtualCurrencyRechargeTime(); // Refresh the recharge time
+            }
         }
     }
 }

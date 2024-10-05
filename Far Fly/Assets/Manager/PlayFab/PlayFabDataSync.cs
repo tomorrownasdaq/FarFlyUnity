@@ -69,20 +69,7 @@ public class PlayFabDataSync : MonoBehaviour
 
     public void SetUserData()
     {
-        PlayFabClientAPI.UpdateUserData(new UpdateUserDataRequest()
-        {
-            Data = new Dictionary<string, string>() {
-            {"Ancestor", "Arthur"},
-            {"Successor", "Fred"},
-            {"UserAceelrationRate", "3"}
-        }
-        },
-        result => Debug.Log("Successfully updated user data"),
-        error =>
-        {
-            Debug.Log("Got error setting user data Ancestor to Arthur");
-            Debug.Log(error.GenerateErrorReport());
-        });
+        
     }
 
 

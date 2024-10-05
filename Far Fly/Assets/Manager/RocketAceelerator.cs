@@ -11,14 +11,15 @@ public class RocketItemButtonAccelerator : MonoBehaviour
     public float accelerationDuration = 2f;
     public float activationX = 10f;
     public int maxUsageCount = 3;
+    public float cooldownDuration = 5f; // 쿨타임 지속 시간
 
-    // BallSpeedManager 참조 추가
     public BallSpeedManager ballSpeedManager;
 
     private Rigidbody2D ballRigidbody;
     private bool isAccelerating = false;
     private float accelerationTimer = 0f;
     private int remainingUses;
+    private float cooldownTimer = 0f; // 쿨타임 타이머
 
     void Start()
     {
@@ -39,7 +40,6 @@ public class RocketItemButtonAccelerator : MonoBehaviour
             return;
         }
 
-        // BallSpeedManager 찾기
         if (ballSpeedManager == null)
         {
             ballSpeedManager = FindObjectOfType<BallSpeedManager>();
@@ -64,6 +64,17 @@ public class RocketItemButtonAccelerator : MonoBehaviour
                 StopAcceleration();
             }
         }
+
+        if (cooldownTimer > 0)
+        {
+            cooldownTimer -= Time.deltaTime;
+            if (cooldownTimer <= 0)
+            {
+                cooldownTimer = 0;
+                Debug.Log("Cooldown finished. Rocket item is ready to use.");
+            }
+        }
+
         UpdateUI();
     }
 
@@ -79,10 +90,11 @@ public class RocketItemButtonAccelerator : MonoBehaviour
     void TryActivateRocketItem()
     {
         bool isGameOver = IsGameOver();
-        if (!isGameOver && !isAccelerating && ballObject.transform.position.x > activationX && remainingUses > 0)
+        if (!isGameOver && !isAccelerating && ballObject.transform.position.x > activationX && remainingUses > 0 && cooldownTimer <= 0)
         {
             StartAcceleration();
             remainingUses--;
+            cooldownTimer = cooldownDuration; // 쿨타임 시작
         }
         else if (isGameOver)
         {
@@ -95,6 +107,10 @@ public class RocketItemButtonAccelerator : MonoBehaviour
         else if (ballObject.transform.position.x <= activationX)
         {
             Debug.Log("Cannot activate rocket item. Ball hasn't reached the activation point yet.");
+        }
+        else if (cooldownTimer > 0)
+        {
+            Debug.Log($"Cannot activate rocket item. Cooldown time remaining: {cooldownTimer:F1} seconds.");
         }
     }
 
@@ -119,8 +135,9 @@ public class RocketItemButtonAccelerator : MonoBehaviour
         bool isGameOver = IsGameOver();
         bool isBallPastActivationPoint = ballObject != null && ballObject.transform.position.x > activationX;
         bool hasRemainingUses = remainingUses > 0;
+        bool isCooldownActive = cooldownTimer > 0;
 
-        bool canUse = !isGameOver && !isAccelerating && isBallPastActivationPoint && hasRemainingUses;
+        bool canUse = !isGameOver && !isAccelerating && isBallPastActivationPoint && hasRemainingUses && !isCooldownActive;
 
         if (rocketItemButton != null)
         {
@@ -129,7 +146,14 @@ public class RocketItemButtonAccelerator : MonoBehaviour
 
         if (itemCountText != null)
         {
-            itemCountText.text = $"{remainingUses}";
+            if (isCooldownActive)
+            {
+                itemCountText.text = $"{remainingUses} ({cooldownTimer:F1}s)";
+            }
+            else
+            {
+                itemCountText.text = $"{remainingUses}";
+            }
         }
     }
 
@@ -150,6 +174,6 @@ public class RocketItemButtonAccelerator : MonoBehaviour
 
     void LogStatus()
     {
-       
+
     }
 }

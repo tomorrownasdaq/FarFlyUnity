@@ -1160,6 +1160,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 978334184}
   m_CullTransparentMesh: 1
+--- !u!1 &1037086317
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1037086319}
+  m_Layer: 0
+  m_Name: Feel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1037086319
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1037086317}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 253.15132, y: 1320.9188, z: 6.7758}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1083970652 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5051939479771349106, guid: eeb1313e6357482498bd68ae536767f5, type: 3}
@@ -1550,12 +1581,12 @@ MonoBehaviour:
   ballObject: {fileID: 1083970652}
   rocketItemButton: {fileID: 1394125207}
   itemCountText: {fileID: 727477315}
-  accelerationForceX: 2000
-  accelerationForceY: 2000
+  accelerationForceX: 1000
+  accelerationForceY: 1000
   accelerationDuration: 2
   activationX: 0
-  maxUsageCount: 3
-  ballSpeedManager: {fileID: 0}
+  maxUsageCount: 2
+  ballSpeedManager: {fileID: 3867083984994898735}
 --- !u!4 &1395057232
 Transform:
   m_ObjectHideFlags: 0
@@ -2157,7 +2188,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1320461498621250837, guid: eeb1313e6357482498bd68ae536767f5, type: 3}
       propertyPath: deceleration
-      value: 500
+      value: 200
       objectReference: {fileID: 0}
     - target: {fileID: 1320461498621250837, guid: eeb1313e6357482498bd68ae536767f5, type: 3}
       propertyPath: maxXPosition
@@ -2501,3 +2532,4 @@ SceneRoots:
   - {fileID: 1395057232}
   - {fileID: 1244218208}
   - {fileID: 1182387669}
+  - {fileID: 1037086319}
