@@ -2360,7 +2360,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ballRigidbody: {fileID: 3867083984994898734}
   stopThreshold: 10
-  gameOverXThreshold: -500
+  gameOverXThreshold: 200
   gameOver: 0
   debugUpdateInterval: 1
 --- !u!1 &4996585022788465629
