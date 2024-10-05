@@ -4,6 +4,8 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using PlayFab;
 using PlayFab.ClientModels;
+using GoogleMobileAds.Api;
+using System;
 
 public class GameOverManager : MonoBehaviour
 {
@@ -15,11 +17,17 @@ public class GameOverManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI goldRewardText;
     [SerializeField] private TextMeshProUGUI diamondRewardText;
     [SerializeField] private Button menuButton;
+    [SerializeField] private Button doubleRewardButton;
 
     [Header("Settings")]
     public string menuSceneName = "StageScene";
     [SerializeField] private float goldMultiplier = 0.1f;
     [SerializeField] private float diamondMultiplier = 0.01f;
+
+    private RewardedAd rewardedAd;
+    private const string RewardedAdUnitId = "ca-app-pub-6216768731453744/9225702681";
+    private float currentDistance;
+    private bool rewardDoubled = false;
 
     private void Awake()
     {
@@ -27,7 +35,6 @@ public class GameOverManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            // DontDestroyOnLoad 제거
             gameOverPanel.SetActive(false);
             SceneManager.sceneLoaded += OnSceneLoaded;
             Debug.Log("GameOverManager instance created.");
@@ -43,6 +50,44 @@ public class GameOverManager : MonoBehaviour
     {
         Debug.Log("GameOverManager Start method called.");
         SetupUI();
+        InitializeAds();
+    }
+
+    private void InitializeAds()
+    {
+        Debug.Log("Initializing Ads...");
+        MobileAds.Initialize(initStatus => {
+            Debug.Log("AdMob SDK initialized");
+            LoadRewardedAd();
+        });
+    }
+
+    private void LoadRewardedAd()
+    {
+        Debug.Log("Loading Rewarded Ad...");
+        if (rewardedAd != null)
+        {
+            rewardedAd.Destroy();
+            rewardedAd = null;
+        }
+
+        var adRequest = new AdRequest();
+
+        RewardedAd.Load(RewardedAdUnitId, adRequest,
+            (RewardedAd ad, LoadAdError error) =>
+            {
+                if (error != null || ad == null)
+                {
+                    Debug.LogError("Rewarded ad failed to load: " + error);
+                    return;
+                }
+
+                rewardedAd = ad;
+                Debug.Log("Rewarded ad loaded successfully");
+
+                rewardedAd.OnAdFullScreenContentClosed += HandleRewardedAdClosed;
+                rewardedAd.OnAdFullScreenContentFailed += HandleRewardedAdFailedToShow;
+            });
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -52,7 +97,7 @@ public class GameOverManager : MonoBehaviour
         {
             HideGameOverPanel();
         }
-        SetupUI(); // UI 재설정 추가
+        SetupUI();
     }
 
     private void SetupUI()
@@ -77,6 +122,19 @@ public class GameOverManager : MonoBehaviour
         {
             Debug.LogError("Menu Button is not assigned in the inspector!");
         }
+
+        if (doubleRewardButton != null)
+        {
+            doubleRewardButton.onClick.RemoveAllListeners();
+            
+            doubleRewardButton.onClick.AddListener(ShowRewardedAd);
+            
+            Debug.Log("Double Reward button listener set up.");
+        }
+        else
+        {
+            Debug.LogError("Double Reward Button is not assigned in the inspector!");
+        }
     }
 
     private void HideGameOverPanel()
@@ -95,18 +153,18 @@ public class GameOverManager : MonoBehaviour
     public void ShowGameOver(float distance)
     {
         Debug.Log($"ShowGameOver called with distance: {distance}");
+        currentDistance = distance;
+        rewardDoubled = false;
         if (gameOverPanel != null)
         {
             UpdateDistanceText(distance);
             UpdateRewardTexts(distance);
-            AddRewardsToServer(distance);
             gameOverPanel.SetActive(true);
             Debug.Log("Game Over Panel shown.");
         }
         else
         {
             Debug.LogError("Game Over Panel is not assigned! Make sure to assign it in the Inspector.");
-            // 추가 디버그 정보
             Debug.LogError($"GameOverManager instance: {(Instance != null ? "exists" : "null")}");
             Debug.LogError($"This instance: {(this == Instance ? "is" : "is not")} the singleton instance");
         }
@@ -130,6 +188,12 @@ public class GameOverManager : MonoBehaviour
         int goldReward = Mathf.FloorToInt(distance * goldMultiplier);
         int diamondReward = Mathf.FloorToInt(distance * diamondMultiplier);
 
+        if (rewardDoubled)
+        {
+            goldReward *= 2;
+            diamondReward *= 2;
+        }
+
         if (goldRewardText != null)
         {
             goldRewardText.text = $"{goldReward}";
@@ -151,10 +215,16 @@ public class GameOverManager : MonoBehaviour
         }
     }
 
-    private void AddRewardsToServer(float distance)
+    private void AddRewardsToServer(float distance, bool doubled)
     {
         int goldReward = Mathf.FloorToInt(distance * goldMultiplier);
         int diamondReward = Mathf.FloorToInt(distance * diamondMultiplier);
+
+        if (doubled)
+        {
+            goldReward *= 2;
+            diamondReward *= 2;
+        }
 
         var request = new AddUserVirtualCurrencyRequest
         {
@@ -168,6 +238,39 @@ public class GameOverManager : MonoBehaviour
         PlayFabClientAPI.AddUserVirtualCurrency(request, OnAddDiamondsSuccess, OnAddCurrencyFailure);
 
         Debug.Log($"Attempting to add rewards to server: Gold: {goldReward}, Diamonds: {diamondReward}");
+    }
+
+    private void ShowRewardedAd()
+    {
+        Debug.Log("Attempting to show Rewarded Ad...");
+        if (rewardedAd != null && rewardedAd.CanShowAd())
+        {
+            rewardedAd.Show((Reward reward) =>
+            {
+                Debug.Log("Rewarded Ad watched successfully. Doubling rewards.");
+                rewardDoubled = true;
+                UpdateRewardTexts(currentDistance);
+                AddRewardsToServer(currentDistance, true);
+                SceneManager.LoadScene("MenuScene");
+            });
+        }
+        else
+        {
+            Debug.Log("Rewarded ad is not ready yet.");
+            LoadRewardedAd();
+        }
+    }
+
+    private void HandleRewardedAdClosed()
+    {
+        Debug.Log("Rewarded Ad closed. Loading next ad.");
+        LoadRewardedAd();
+    }
+
+    private void HandleRewardedAdFailedToShow(AdError error)
+    {
+        Debug.LogError("Rewarded ad failed to show: " + error);
+        LoadRewardedAd();
     }
 
     private void OnAddGoldSuccess(ModifyUserVirtualCurrencyResult result)
@@ -188,6 +291,7 @@ public class GameOverManager : MonoBehaviour
     private void GoToMenu()
     {
         Debug.Log("GoToMenu called.");
+        AddRewardsToServer(currentDistance, rewardDoubled);
         HideGameOverPanel();
         SceneManager.LoadScene(menuSceneName);
     }
@@ -196,5 +300,9 @@ public class GameOverManager : MonoBehaviour
     {
         Debug.Log("GameOverManager OnDestroy called.");
         SceneManager.sceneLoaded -= OnSceneLoaded;
+        if (rewardedAd != null)
+        {
+            rewardedAd.Destroy();
+        }
     }
 }

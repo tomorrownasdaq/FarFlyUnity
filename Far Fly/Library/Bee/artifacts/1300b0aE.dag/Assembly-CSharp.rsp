@@ -406,6 +406,7 @@
 "Assets/Level/ParallaxBackground.cs.cs"
 "Assets/Level/ParallaxCamera.cs.cs"
 "Assets/Level/ParallaxLayer.cs.cs"
+"Assets/Manager/AdButton.cs"
 "Assets/Manager/BackgroundManager.cs"
 "Assets/Manager/Ball/BallManager.cs"
 "Assets/Manager/Ball/BallMessage.cs"
