@@ -1,11 +1,8 @@
 using UnityEngine;
 using UnityEngine.Purchasing;
-using System.Collections.Generic;
-using TMPro;
 using System;
 using PlayFab;
-using PlayFab.EconomyModels;
-using PlayFab.ClientModels;  // 추가된 네임스페이스
+using PlayFab.ClientModels;
 
 public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
 {
@@ -15,14 +12,6 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
     private const string DIAMOND_CURRENCY_ID = "DI";
     private const string POWER_CURRENCY_ID = "PW";
     private const string GOLD_CURRENCY_ID = "GL";
-
-    private int currentDiamonds = 0;
-    private int currentPower = 0;
-    private int currentGold = 0;
-
-    [SerializeField] private TextMeshProUGUI DiamondText;
-    [SerializeField] private TextMeshProUGUI PowerText;
-    [SerializeField] private TextMeshProUGUI GoldText;
 
     private static IStoreController storeController;
     private static IExtensionProvider storeExtensionProvider;
@@ -36,35 +25,7 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
 
     private void DelayedInitialization()
     {
-        LoadInitialCurrencyCount();
         InitializePurchasing();
-    }
-
-    private void LoadInitialCurrencyCount()
-    {
-        GetCurrencyBalances();
-    }
-
-    public void GetCurrencyBalances()
-    {
-        var request = new GetUserInventoryRequest();
-
-        PlayFabClientAPI.GetUserInventory(request,
-            result => {
-                currentDiamonds = result.VirtualCurrency.ContainsKey(DIAMOND_CURRENCY_ID) ? result.VirtualCurrency[DIAMOND_CURRENCY_ID] : 0;
-                currentPower = result.VirtualCurrency.ContainsKey(POWER_CURRENCY_ID) ? result.VirtualCurrency[POWER_CURRENCY_ID] : 0;
-                currentGold = result.VirtualCurrency.ContainsKey(GOLD_CURRENCY_ID) ? result.VirtualCurrency[GOLD_CURRENCY_ID] : 0;
-
-                UpdateDiamondText();
-                UpdatePowerText();
-                UpdateGoldText();
-
-                Debug.Log($"PlayFab에서 화폐 잔액을 가져왔습니다: 다이아몬드 {currentDiamonds}, 파워 {currentPower}, 골드 {currentGold}");
-            },
-            error => {
-                Debug.LogError($"PlayFab에서 화폐 잔액을 가져오는 데 실패했습니다: {error.ErrorMessage}");
-            }
-        );
     }
 
     private void InitializePurchasing()
@@ -165,8 +126,8 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
 
         PlayFabClientAPI.AddUserVirtualCurrency(request,
             result => {
-                GetCurrencyBalances(); // 모든 잔액 새로고침
                 Debug.Log($"{currencyId} {amount}개 추가됨. 새 잔액: {result.Balance}");
+                UpdateCurrencyDisplay();
             },
             error => {
                 Debug.LogError($"PlayFab {currencyId} 추가 실패: {error.ErrorMessage}");
@@ -174,39 +135,16 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
         );
     }
 
-    private void UpdateDiamondText()
+    private void UpdateCurrencyDisplay()
     {
-        if (DiamondText != null)
+        PlayFabSpecificCurrencyDisplay currencyDisplay = FindObjectOfType<PlayFabSpecificCurrencyDisplay>();
+        if (currencyDisplay != null)
         {
-            DiamondText.text = $"{currentDiamonds}";
+            currencyDisplay.SyncCurrency();
         }
         else
         {
-            Debug.LogWarning("Diamond Text UI가 할당되지 않았습니다.");
-        }
-    }
-
-    private void UpdatePowerText()
-    {
-        if (PowerText != null)
-        {
-            PowerText.text = $"{currentPower}";
-        }
-        else
-        {
-            Debug.LogWarning("Power Text UI가 할당되지 않았습니다.");
-        }
-    }
-
-    private void UpdateGoldText()
-    {
-        if (GoldText != null)
-        {
-            GoldText.text = $"{currentGold}";
-        }
-        else
-        {
-            Debug.LogWarning("Gold Text UI가 할당되지 않았습니다.");
+            Debug.LogWarning("PlayFabSpecificCurrencyDisplay를 찾을 수 없습니다. 통화 표시가 업데이트되지 않았습니다.");
         }
     }
 }

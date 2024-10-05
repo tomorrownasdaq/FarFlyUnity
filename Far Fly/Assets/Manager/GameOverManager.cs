@@ -28,6 +28,7 @@ public class GameOverManager : MonoBehaviour
         {
             Instance = this;
             // DontDestroyOnLoad Á¦°Å
+            gameOverPanel.SetActive(false);
             SceneManager.sceneLoaded += OnSceneLoaded;
             Debug.Log("GameOverManager instance created.");
         }
