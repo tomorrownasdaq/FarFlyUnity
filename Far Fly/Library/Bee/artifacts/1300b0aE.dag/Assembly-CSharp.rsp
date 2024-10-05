@@ -419,6 +419,7 @@
 "Assets/Manager/Inventory/InventoryItemUI.cs"
 "Assets/Manager/Inventory/PlayFabInventoryManager.cs"
 "Assets/Manager/Inventory/StageInventoryManager.cs"
+"Assets/Manager/LeaderboardManager.cs"
 "Assets/Manager/PlayFab/ConfirmationDialog.cs"
 "Assets/Manager/PlayFab/PlayFabCurrencySync.cs"
 "Assets/Manager/PlayFab/PlayFabDataSync.cs"
