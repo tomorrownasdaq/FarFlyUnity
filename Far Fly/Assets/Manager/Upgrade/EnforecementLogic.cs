@@ -21,22 +21,44 @@ public class EnhancementSystem : MonoBehaviour
 
     void Start()
     {
-        enhancementLevel = 0;
-        UpdateUI();
-
         enhanceButton.onClick.AddListener(ShowConfirmationPanel);
         okButton.onClick.AddListener(Enhance);
         cancelButton.onClick.AddListener(HideConfirmationPanel);
+        // PlayFab에서 데이터 로드
+        LoadDataFromPlayFab();
+    }
+
+    void LoadDataFromPlayFab()
+    {
+        PlayFabClientAPI.GetUserData(new GetUserDataRequest(), OnDataReceived, OnPlayFabError);
+        PlayFabClientAPI.GetUserInventory(new GetUserInventoryRequest(), OnInventoryReceived, OnPlayFabError);
+    }
+
+    void OnDataReceived(GetUserDataResult result)
+    {
+        if (result.Data != null && result.Data.ContainsKey("rocket_number"))
+        {
+            if (int.TryParse(result.Data["rocket_number"].Value, out int loadedLevel))
+            {
+                enhancementLevel = loadedLevel;
+                UpdateUI();
+            }
+        }
+    }
+
+    void OnInventoryReceived(GetUserInventoryResult result)
+    {
+        SetCurrentGold(result.VirtualCurrency["GL"]);
     }
 
     void UpdateUI()
     {
-        enhancementLevelText.text = $"Lv. {enhancementLevel}";
+        enhancementLevelText.text = $"{enhancementLevel}";
     }
 
     int GetCurrentGold()
     {
-        if (int.TryParse(goldText.text.Replace("GD: ", ""), out int gold))
+        if (int.TryParse(goldText.text, out int gold))
         {
             return gold;
         }
@@ -52,7 +74,7 @@ public class EnhancementSystem : MonoBehaviour
     void ShowConfirmationPanel()
     {
         enhancementCost = CalculateEnhancementCost();
-        costText.text = $"Cost : {enhancementCost} Gold";
+        costText.text = $"Cost : {enhancementCost} GD";
         confirmationPanel.SetActive(true);
     }
 
@@ -66,11 +88,7 @@ public class EnhancementSystem : MonoBehaviour
         int currentGold = GetCurrentGold();
         if (currentGold >= enhancementCost)
         {
-            SetCurrentGold(currentGold - enhancementCost);
-            enhancementLevel++;
-            UpdateUI();
-            SyncWithPlayFab();
-            HideConfirmationPanel();
+            SubtractGoldFromPlayFab(enhancementCost);
         }
         else
         {
@@ -79,12 +97,32 @@ public class EnhancementSystem : MonoBehaviour
         }
     }
 
+    void SubtractGoldFromPlayFab(int amount)
+    {
+        var request = new SubtractUserVirtualCurrencyRequest
+        {
+            VirtualCurrency = "GL",
+            Amount = amount
+        };
+        PlayFabClientAPI.SubtractUserVirtualCurrency(request, OnGoldSubtracted, OnPlayFabError);
+    }
+
+    void OnGoldSubtracted(ModifyUserVirtualCurrencyResult result)
+    {
+        SetCurrentGold(result.Balance);
+        enhancementLevel++;
+        UpdateUI();
+        SyncRocketNumberWithPlayFab();
+        HideConfirmationPanel();
+        Debug.Log($"강화 성공! 현재 골드: {result.Balance}");
+    }
+
     int CalculateEnhancementCost()
     {
         return Mathf.RoundToInt(1000 * Mathf.Pow(1.6f, enhancementLevel));
     }
 
-    void SyncWithPlayFab()
+    void SyncRocketNumberWithPlayFab()
     {
         var request = new UpdateUserDataRequest
         {
@@ -93,7 +131,6 @@ public class EnhancementSystem : MonoBehaviour
                 {"rocket_number", enhancementLevel.ToString()}
             }
         };
-
         PlayFabClientAPI.UpdateUserData(request, OnPlayFabSuccess, OnPlayFabError);
     }
 
