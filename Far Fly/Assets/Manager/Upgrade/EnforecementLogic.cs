@@ -15,17 +15,35 @@ public class EnhancementSystem : MonoBehaviour
     public TextMeshProUGUI costText;
     public Button okButton;
     public Button cancelButton;
+    public GameObject PowerBuyPanel; // PowerBuyPanel 참조 추가
 
     private int enhancementLevel;
     private int enhancementCost;
 
     void Start()
     {
-        enhanceButton.onClick.AddListener(ShowConfirmationPanel);
-        okButton.onClick.AddListener(Enhance);
+        // 모든 리스너 제거 후 다시 추가
+        enhanceButton.onClick.RemoveAllListeners();
+        okButton.onClick.RemoveAllListeners();
+        cancelButton.onClick.RemoveAllListeners();
+
+        enhanceButton.onClick.AddListener(OnEnhanceButtonClick);
+        okButton.onClick.AddListener(EnhanceUpgrade);
         cancelButton.onClick.AddListener(HideConfirmationPanel);
+
+
         // PlayFab에서 데이터 로드
         LoadDataFromPlayFab();
+    }
+
+    void OnEnhanceButtonClick()
+    {
+        ShowConfirmationUpgradePanel();
+        // PowerBuyPanel이 열려있다면 닫기
+        if (PowerBuyPanel != null)
+        {
+            PowerBuyPanel.SetActive(false);
+        }
     }
 
     void LoadDataFromPlayFab()
@@ -48,7 +66,14 @@ public class EnhancementSystem : MonoBehaviour
 
     void OnInventoryReceived(GetUserInventoryResult result)
     {
-        SetCurrentGold(result.VirtualCurrency["GL"]);
+        if (result.VirtualCurrency.ContainsKey("GL"))
+        {
+            SetCurrentGold(result.VirtualCurrency["GL"]);
+        }
+        else
+        {
+            Debug.LogError("GL 가상화폐를 찾을 수 없습니다.");
+        }
     }
 
     void UpdateUI()
@@ -71,7 +96,7 @@ public class EnhancementSystem : MonoBehaviour
         goldText.text = $"{gold}";
     }
 
-    void ShowConfirmationPanel()
+    void ShowConfirmationUpgradePanel()
     {
         enhancementCost = CalculateEnhancementCost();
         costText.text = $"Cost : {enhancementCost} GD";
@@ -83,7 +108,7 @@ public class EnhancementSystem : MonoBehaviour
         confirmationPanel.SetActive(false);
     }
 
-    public void Enhance()
+    public void EnhanceUpgrade()
     {
         int currentGold = GetCurrentGold();
         if (currentGold >= enhancementCost)
