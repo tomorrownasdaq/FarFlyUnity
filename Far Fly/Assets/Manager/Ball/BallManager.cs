@@ -19,6 +19,9 @@ public class BallManager : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private StageInventoryManager inventoryManager;
 
+    // 새로운 변수: 터치 가능 영역의 상단 경계
+    private float touchableAreaTopY;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -41,22 +44,37 @@ public class BallManager : MonoBehaviour
 
         LoadValuesFromPlayFab();
         LoadSelectedItemImage();
+
+        // 터치 가능 영역 계산
+        CalculateTouchableArea();
+    }
+
+    // 새로운 메서드: 터치 가능 영역 계산
+    void CalculateTouchableArea()
+    {
+        // 화면 하단 4/5 영역만 터치 가능하도록 설정
+        touchableAreaTopY = Screen.height * 0.2f;
     }
 
     void Update()
     {
-        // Check for keyboard input
+        // 키보드 입력 체크
         if (Input.GetKey(KeyCode.Space))
         {
             isAccelerating = true;
         }
-        // Check for touch input
+
+        // 터치 입력 체크 (수정된 부분)
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
-            if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Stationary || touch.phase == TouchPhase.Moved)
+            // 터치 위치가 화면 하단 4/5 영역 내에 있는지 확인
+            if (touch.position.y < Screen.height - touchableAreaTopY)
             {
-                isAccelerating = true;
+                if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Stationary || touch.phase == TouchPhase.Moved)
+                {
+                    isAccelerating = true;
+                }
             }
         }
     }
