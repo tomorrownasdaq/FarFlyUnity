@@ -1,17 +1,37 @@
 using UnityEngine;
 using UnityEngine.Purchasing;
 using System;
+using System.Collections.Generic;
 using PlayFab;
 using PlayFab.ClientModels;
+using TMPro;
+using UnityEngine.UI;
+
+[System.Serializable]
+public class CurrencyItem
+{
+    public string productId;
+    public TextMeshProUGUI amountText;
+    public TextMeshProUGUI priceText;
+    public Button purchaseButton;
+}
+
+[System.Serializable]
+public class CurrencyGroup
+{
+    public string currencyId;
+    public List<CurrencyItem> items;
+}
 
 public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
 {
-    private const string DIAMOND_PACK_ID = "dia10";
-    private const string POWER_PACK_ID = "pw5";
-    private const string GOLD_PACK_ID = "gd500";
-    private const string DIAMOND_CURRENCY_ID = "DI";
-    private const string POWER_CURRENCY_ID = "PW";
-    private const string GOLD_CURRENCY_ID = "GL";
+    [SerializeField]
+    private List<CurrencyGroup> currencyGroups = new List<CurrencyGroup>
+    {
+        new CurrencyGroup { currencyId = "DI", items = new List<CurrencyItem>() },
+        new CurrencyGroup { currencyId = "PW", items = new List<CurrencyItem>() },
+        new CurrencyGroup { currencyId = "GL", items = new List<CurrencyItem>() }
+    };
 
     private static IStoreController storeController;
     private static IExtensionProvider storeExtensionProvider;
@@ -32,9 +52,15 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
     {
         if (IsInitialized()) return;
         var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
-        builder.AddProduct(DIAMOND_PACK_ID, ProductType.Consumable);
-        builder.AddProduct(POWER_PACK_ID, ProductType.Consumable);
-        builder.AddProduct(GOLD_PACK_ID, ProductType.Consumable);
+
+        foreach (var group in currencyGroups)
+        {
+            foreach (var item in group.items)
+            {
+                builder.AddProduct(item.productId, ProductType.Consumable);
+            }
+        }
+
         UnityPurchasing.Initialize(this, builder);
     }
 
@@ -74,6 +100,39 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
         storeController = controller;
         storeExtensionProvider = extensions;
         Debug.Log("IAP 초기화 성공");
+        UpdatePriceDisplays();
+        SetupPurchaseButtons();
+    }
+
+    private void UpdatePriceDisplays()
+    {
+        foreach (var group in currencyGroups)
+        {
+            foreach (var item in group.items)
+            {
+                Product product = storeController.products.WithID(item.productId);
+                if (product != null)
+                {
+                    item.priceText.text = product.metadata.localizedPriceString;
+                }
+                else
+                {
+                    Debug.LogWarning($"상품을 찾을 수 없음: {item.productId}");
+                }
+            }
+        }
+    }
+
+    private void SetupPurchaseButtons()
+    {
+        foreach (var group in currencyGroups)
+        {
+            foreach (var item in group.items)
+            {
+                item.purchaseButton.onClick.RemoveAllListeners();
+                item.purchaseButton.onClick.AddListener(() => OnPurchaseButtonClick(item.productId));
+            }
+        }
     }
 
     public void OnInitializeFailed(InitializationFailureReason error)
@@ -89,26 +148,31 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
 
     public PurchaseProcessingResult ProcessPurchase(PurchaseEventArgs args)
     {
-        if (string.Equals(args.purchasedProduct.definition.id, DIAMOND_PACK_ID, StringComparison.Ordinal))
+        foreach (var group in currencyGroups)
         {
-            AddCurrencyToPlayFab(DIAMOND_CURRENCY_ID, 10);
-            return PurchaseProcessingResult.Complete;
+            foreach (var item in group.items)
+            {
+                if (string.Equals(args.purchasedProduct.definition.id, item.productId, StringComparison.Ordinal))
+                {
+                    int amount = GetCurrencyAmount(item);
+                    AddCurrencyToPlayFab(group.currencyId, amount);
+                    return PurchaseProcessingResult.Complete;
+                }
+            }
         }
-        else if (string.Equals(args.purchasedProduct.definition.id, POWER_PACK_ID, StringComparison.Ordinal))
+
+        Debug.LogWarning($"알 수 없는 제품 구매: {args.purchasedProduct.definition.id}");
+        return PurchaseProcessingResult.Pending;
+    }
+
+    private int GetCurrencyAmount(CurrencyItem item)
+    {
+        if (int.TryParse(item.amountText.text, out int amount))
         {
-            AddCurrencyToPlayFab(POWER_CURRENCY_ID, 5);
-            return PurchaseProcessingResult.Complete;
+            return amount;
         }
-        else if (string.Equals(args.purchasedProduct.definition.id, GOLD_PACK_ID, StringComparison.Ordinal))
-        {
-            AddCurrencyToPlayFab(GOLD_CURRENCY_ID, 500);
-            return PurchaseProcessingResult.Complete;
-        }
-        else
-        {
-            Debug.LogWarning($"알 수 없는 제품 구매: {args.purchasedProduct.definition.id}");
-            return PurchaseProcessingResult.Pending;
-        }
+        Debug.LogWarning($"통화 수량을 파싱할 수 없음: {item.productId}. 기본값 0 반환.");
+        return 0;
     }
 
     public void OnPurchaseFailed(Product product, PurchaseFailureReason failureReason)
