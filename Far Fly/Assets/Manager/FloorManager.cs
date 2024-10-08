@@ -23,7 +23,7 @@ public class FloorManager : MonoBehaviour
     void FixedUpdate()
     {
         // Check if we need to spawn a new floor
-        if (ballObject.transform.position.x > lastFloorX - floorWidth - 80f && ballObject.transform.position.x > 2)
+        if (ballObject.transform.position.x > lastFloorX - floorWidth - 200f && ballObject.transform.position.x > 2)
         {
             SpawnFloor();
             Debug.Log(floorObjects.Count);

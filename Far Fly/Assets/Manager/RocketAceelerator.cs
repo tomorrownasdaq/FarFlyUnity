@@ -172,7 +172,7 @@ public class RocketItemButtonAccelerator : MonoBehaviour
         {
             if (cooldownTimer > 0)
             {
-                itemCountText.text = $"{remainingUses} ({cooldownTimer:F1}s)";
+                itemCountText.text = $"{remainingUses} \n ({cooldownTimer:F1}s)";
             }
             else
             {

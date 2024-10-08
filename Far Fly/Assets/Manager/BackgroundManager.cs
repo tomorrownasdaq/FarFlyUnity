@@ -45,7 +45,7 @@ public class BackgroundManager : MonoBehaviour
     void SpawnBackground()
     {
         // Y 위치에 backgroundYOffset을 적용합니다.
-        Vector3 spawnPosition = new Vector3(lastBackgroundX+1000, backgroundYOffset, 0.2f);
+        Vector3 spawnPosition = new Vector3(lastBackgroundX+2700, backgroundYOffset, 0.2f);
         GameObject newBackground = Instantiate(backgroundPrefab, spawnPosition, Quaternion.identity);
         backgroundObjects.Add(newBackground);
         lastBackgroundX = newBackground.transform.position.x + 30f * backgroundWidth;
