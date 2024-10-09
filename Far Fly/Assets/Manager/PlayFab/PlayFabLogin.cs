@@ -9,13 +9,19 @@ public class PlayFabLogin : MonoBehaviour
 {
     void Start()
     {
+
+        PlayGamesPlatform.DebugLogEnabled = true;
+        PlayGamesPlatform.Activate();
         LoginStart();
+        
         //PlayGamesPlatform.Instance.Authenticate(ProcessAuthentication);
     }
 
     public void LoginStart()
     {
+        PlayGamesPlatform.Activate();
         PlayGamesPlatform.Instance.Authenticate(ProcessAuthentication);
+        
         CheckDisplayName();
 
     }

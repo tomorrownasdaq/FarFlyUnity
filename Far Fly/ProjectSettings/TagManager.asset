@@ -8,6 +8,7 @@ TagManager:
   - Booster
   - Ball
   - Background
+  - slot
   layers:
   - Default
   - TransparentFX
@@ -15,7 +16,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - background
   - 
   - 
   - 
@@ -44,4 +45,10 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: New Layer 1
+    uniqueID: 2594345525
+    locked: 0
+  - name: background
+    uniqueID: 2909128089
     locked: 0

@@ -12,7 +12,7 @@ public class MultiCurrencyPurchaser : MonoBehaviour, IStoreListener
     private const string DIAMOND_PACK_2500 = "dia2500";
 
     // °ñµå ÆÑ
-    private const string GOLD_PACK_3000 = "gd3000";
+    private const string GOLD_PACK_3000 = "gd30000";
     private const string GOLD_PACK_7000 = "gd7000";
     private const string GOLD_PACK_1000 = "gd1000";
 

@@ -29,6 +29,7 @@ public class GameOverManager : MonoBehaviour
     private const string RewardedAdUnitId = "ca-app-pub-6216768731453744/9225702681";
     private float currentDistance;
     private bool rewardDoubled = false;
+    private bool isSubscribed = false;
 
     private void Awake()
     {
@@ -52,6 +53,39 @@ public class GameOverManager : MonoBehaviour
         Debug.Log("GameOverManager Start method called.");
         SetupUI();
         InitializeAds();
+        CheckSubscriptionStatus();
+    }
+
+    private void CheckSubscriptionStatus()
+    {
+        PlayFabClientAPI.GetTitleData(new GetTitleDataRequest(), OnGetTitleDataSuccess, OnGetTitleDataFailure);
+    }
+
+    private void OnGetTitleDataSuccess(GetTitleDataResult result)
+    {
+        if (result.Data.TryGetValue("SubscriptionStatus", out string subscriptionStatus))
+        {
+            isSubscribed = subscriptionStatus.ToLower() == "true";
+            Debug.Log($"Subscription status: {isSubscribed}");
+            UpdateUIBasedOnSubscription();
+        }
+        else
+        {
+            Debug.LogWarning("SubscriptionStatus not found in Title Data");
+        }
+    }
+
+    private void OnGetTitleDataFailure(PlayFabError error)
+    {
+        Debug.LogError($"Failed to get Title Data: {error.ErrorMessage}");
+    }
+
+    private void UpdateUIBasedOnSubscription()
+    {
+        if (isSubscribed && doubleRewardButton != null)
+        {
+            doubleRewardButton.gameObject.SetActive(false);
+        }
     }
 
     private void InitializeAds()
@@ -127,9 +161,7 @@ public class GameOverManager : MonoBehaviour
         if (doubleRewardButton != null)
         {
             doubleRewardButton.onClick.RemoveAllListeners();
-            
             doubleRewardButton.onClick.AddListener(ShowRewardedAd);
-            
             Debug.Log("Double Reward button listener set up.");
         }
         else
@@ -163,6 +195,12 @@ public class GameOverManager : MonoBehaviour
             gameOverPanel.SetActive(true);
             Debug.Log("Game Over Panel shown.");
             SubmitScoreToLeaderboard(distance);
+
+            if (isSubscribed)
+            {
+                Debug.Log("User is subscribed. Adding rewards without showing ad.");
+                AddRewardsToServer(distance, true);
+            }
         }
         else
         {
@@ -171,7 +209,6 @@ public class GameOverManager : MonoBehaviour
             Debug.LogError($"This instance: {(this == Instance ? "is" : "is not")} the singleton instance");
         }
     }
-
 
     private void SubmitScoreToLeaderboard(float distance)
     {
@@ -217,7 +254,7 @@ public class GameOverManager : MonoBehaviour
         int goldReward = Mathf.FloorToInt(distance * goldMultiplier);
         int diamondReward = Mathf.FloorToInt(distance * diamondMultiplier);
 
-        if (rewardDoubled)
+        if (rewardDoubled || isSubscribed)
         {
             goldReward *= 2;
             diamondReward *= 2;
@@ -271,22 +308,33 @@ public class GameOverManager : MonoBehaviour
 
     private void ShowRewardedAd()
     {
-        Debug.Log("Attempting to show Rewarded Ad...");
-        if (rewardedAd != null && rewardedAd.CanShowAd())
+        if (isSubscribed)
         {
-            rewardedAd.Show((Reward reward) =>
-            {
-                Debug.Log("Rewarded Ad watched successfully. Doubling rewards.");
-                rewardDoubled = true;
-                UpdateRewardTexts(currentDistance);
-                AddRewardsToServer(currentDistance, true);
-                SceneManager.LoadScene("MenuScene");
-            });
+            Debug.Log("User is subscribed. Doubling rewards without showing ad.");
+            rewardDoubled = true;
+            UpdateRewardTexts(currentDistance);
+            AddRewardsToServer(currentDistance, true);
+            SceneManager.LoadScene("MenuScene");
         }
         else
         {
-            Debug.Log("Rewarded ad is not ready yet.");
-            LoadRewardedAd();
+            Debug.Log("Attempting to show Rewarded Ad...");
+            if (rewardedAd != null && rewardedAd.CanShowAd())
+            {
+                rewardedAd.Show((Reward reward) =>
+                {
+                    Debug.Log("Rewarded Ad watched successfully. Doubling rewards.");
+                    rewardDoubled = true;
+                    UpdateRewardTexts(currentDistance);
+                    AddRewardsToServer(currentDistance, true);
+                    SceneManager.LoadScene("MenuScene");
+                });
+            }
+            else
+            {
+                Debug.Log("Rewarded ad is not ready yet.");
+                LoadRewardedAd();
+            }
         }
     }
 
@@ -320,7 +368,7 @@ public class GameOverManager : MonoBehaviour
     private void GoToMenu()
     {
         Debug.Log("GoToMenu called.");
-        AddRewardsToServer(currentDistance, rewardDoubled);
+        AddRewardsToServer(currentDistance, isSubscribed || rewardDoubled);
         HideGameOverPanel();
         SceneManager.LoadScene(menuSceneName);
     }
