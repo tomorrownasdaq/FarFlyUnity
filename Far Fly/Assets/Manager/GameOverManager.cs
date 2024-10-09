@@ -58,33 +58,39 @@ public class GameOverManager : MonoBehaviour
 
     private void CheckSubscriptionStatus()
     {
-        PlayFabClientAPI.GetTitleData(new GetTitleDataRequest(), OnGetTitleDataSuccess, OnGetTitleDataFailure);
+        PlayFabClientAPI.GetUserData(new GetUserDataRequest(), OnGetUserDataSuccess, OnPlayFabError);
     }
 
-    private void OnGetTitleDataSuccess(GetTitleDataResult result)
+    private void OnGetUserDataSuccess(GetUserDataResult result)
     {
-        if (result.Data.TryGetValue("SubscriptionStatus", out string subscriptionStatus))
+        if (result.Data != null && result.Data.TryGetValue("SubscriptionStatus", out UserDataRecord statusRecord))
         {
-            isSubscribed = subscriptionStatus.ToLower() == "true";
+            isSubscribed = bool.Parse(statusRecord.Value);
             Debug.Log($"Subscription status: {isSubscribed}");
             UpdateUIBasedOnSubscription();
         }
         else
         {
-            Debug.LogWarning("SubscriptionStatus not found in Title Data");
+            Debug.Log("Subscription status not found in User Data.");
+            isSubscribed = false;
         }
     }
 
-    private void OnGetTitleDataFailure(PlayFabError error)
+    private void OnPlayFabError(PlayFabError error)
     {
-        Debug.LogError($"Failed to get Title Data: {error.ErrorMessage}");
+        Debug.LogError($"PlayFab operation failed: {error.ErrorMessage}");
     }
 
     private void UpdateUIBasedOnSubscription()
     {
-        if (isSubscribed && doubleRewardButton != null)
+        if (isSubscribed)
         {
-            doubleRewardButton.gameObject.SetActive(false);
+            if (doubleRewardButton != null)
+            {
+                doubleRewardButton.gameObject.SetActive(false);
+            }
+            rewardDoubled = true;
+            UpdateRewardTexts(currentDistance);
         }
     }
 
@@ -187,7 +193,7 @@ public class GameOverManager : MonoBehaviour
     {
         Debug.Log($"ShowGameOver called with distance: {distance}");
         currentDistance = distance;
-        rewardDoubled = false;
+        rewardDoubled = isSubscribed;  // 구독자는 항상 2배 보상
         if (gameOverPanel != null)
         {
             UpdateDistanceText(distance);
@@ -196,9 +202,12 @@ public class GameOverManager : MonoBehaviour
             Debug.Log("Game Over Panel shown.");
             SubmitScoreToLeaderboard(distance);
 
+            // 구독 상태 로그
+            Debug.Log($"User subscription status: {(isSubscribed ? "Subscribed" : "Not subscribed")}");
+
+            // 구독자인 경우 즉시 보상 지급
             if (isSubscribed)
             {
-                Debug.Log("User is subscribed. Adding rewards without showing ad.");
                 AddRewardsToServer(distance, true);
             }
         }
@@ -254,7 +263,7 @@ public class GameOverManager : MonoBehaviour
         int goldReward = Mathf.FloorToInt(distance * goldMultiplier);
         int diamondReward = Mathf.FloorToInt(distance * diamondMultiplier);
 
-        if (rewardDoubled || isSubscribed)
+        if (rewardDoubled)
         {
             goldReward *= 2;
             diamondReward *= 2;
@@ -263,6 +272,10 @@ public class GameOverManager : MonoBehaviour
         if (goldRewardText != null)
         {
             goldRewardText.text = $"{goldReward}";
+            if (isSubscribed)
+            {
+                goldRewardText.text += " (2x Bonus)";
+            }
             Debug.Log($"Gold reward text updated: {goldRewardText.text}");
         }
         else
@@ -273,6 +286,10 @@ public class GameOverManager : MonoBehaviour
         if (diamondRewardText != null)
         {
             diamondRewardText.text = $"{diamondReward}";
+            if (isSubscribed)
+            {
+                diamondRewardText.text += " (2x Bonus)";
+            }
             Debug.Log($"Diamond reward text updated: {diamondRewardText.text}");
         }
         else
@@ -310,31 +327,24 @@ public class GameOverManager : MonoBehaviour
     {
         if (isSubscribed)
         {
-            Debug.Log("User is subscribed. Doubling rewards without showing ad.");
-            rewardDoubled = true;
-            UpdateRewardTexts(currentDistance);
-            AddRewardsToServer(currentDistance, true);
-            SceneManager.LoadScene("MenuScene");
+            Debug.Log("User is subscribed. Double rewards already applied.");
+            return;
+        }
+
+        Debug.Log("Attempting to show Rewarded Ad...");
+        if (rewardedAd != null && rewardedAd.CanShowAd())
+        {
+            rewardedAd.Show((Reward reward) =>
+            {
+                Debug.Log("Rewarded Ad watched successfully. Doubling rewards.");
+                rewardDoubled = true;
+                UpdateRewardTexts(currentDistance);
+            });
         }
         else
         {
-            Debug.Log("Attempting to show Rewarded Ad...");
-            if (rewardedAd != null && rewardedAd.CanShowAd())
-            {
-                rewardedAd.Show((Reward reward) =>
-                {
-                    Debug.Log("Rewarded Ad watched successfully. Doubling rewards.");
-                    rewardDoubled = true;
-                    UpdateRewardTexts(currentDistance);
-                    AddRewardsToServer(currentDistance, true);
-                    SceneManager.LoadScene("MenuScene");
-                });
-            }
-            else
-            {
-                Debug.Log("Rewarded ad is not ready yet.");
-                LoadRewardedAd();
-            }
+            Debug.Log("Rewarded ad is not ready yet.");
+            LoadRewardedAd();
         }
     }
 
@@ -368,7 +378,10 @@ public class GameOverManager : MonoBehaviour
     private void GoToMenu()
     {
         Debug.Log("GoToMenu called.");
-        AddRewardsToServer(currentDistance, isSubscribed || rewardDoubled);
+        if (!isSubscribed)  // 구독자가 아닌 경우에만 여기서 보상 추가
+        {
+            AddRewardsToServer(currentDistance, rewardDoubled);
+        }
         HideGameOverPanel();
         SceneManager.LoadScene(menuSceneName);
     }

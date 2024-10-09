@@ -4182,6 +4182,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   subscriptionButton: {fileID: 1944385678}
+  doubleRewardButton: {fileID: 74238477}
 --- !u!4 &1676086521
 Transform:
   m_ObjectHideFlags: 0

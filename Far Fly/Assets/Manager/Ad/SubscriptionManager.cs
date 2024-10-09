@@ -9,6 +9,7 @@ using UnityEngine.Purchasing;
 public class SubscriptionManager : MonoBehaviour, IStoreListener
 {
     [SerializeField] private Button subscriptionButton;
+    [SerializeField] private Button doubleRewardButton; // 새로 추가된 부분
 
     private IStoreController storeController;
     private IExtensionProvider storeExtensionProvider;
@@ -33,6 +34,12 @@ public class SubscriptionManager : MonoBehaviour, IStoreListener
         else
         {
             Debug.LogError("Subscription Button is not assigned in the inspector!");
+        }
+
+        // doubleRewardButton 확인 (새로 추가된 부분)
+        if (doubleRewardButton == null)
+        {
+            Debug.LogError("Double Reward Button is not assigned in the inspector!");
         }
     }
 
@@ -72,10 +79,20 @@ public class SubscriptionManager : MonoBehaviour, IStoreListener
         if (IsSubscribed)
         {
             subscriptionButton.gameObject.SetActive(false);
+            if (doubleRewardButton != null)
+            {
+                doubleRewardButton.gameObject.SetActive(false);
+            }
+            Debug.Log("User is subscribed. Subscription and Double Reward buttons hidden.");
         }
         else
         {
             subscriptionButton.gameObject.SetActive(true);
+            if (doubleRewardButton != null)
+            {
+                doubleRewardButton.gameObject.SetActive(true);
+            }
+            Debug.Log("User is not subscribed. Subscription and Double Reward buttons shown.");
         }
     }
 
