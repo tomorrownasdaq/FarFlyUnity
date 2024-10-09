@@ -1,38 +1,24 @@
 using UnityEngine;
 using TMPro;
-using System.Collections.Generic;
 
 public class PrivacyPolicyHyper : MonoBehaviour
 {
-    [System.Serializable]
-    public class HyperlinkData
-    {
-        public HyperlinkText hyperlinkText; // Inspector에서 할당
-        public string linkId;
-        public string linkText;
-        public string url;
-    }
-
-    public List<HyperlinkData> hyperlinkDataList = new List<HyperlinkData>();
+    public HyperlinkText hyperlinkText; // Inspector에서 할당
 
     void Start()
     {
-        foreach (var data in hyperlinkDataList)
+        if (hyperlinkText == null)
         {
-            if (data.hyperlinkText == null)
-            {
-                Debug.LogError($"HyperlinkText component for {data.linkId} is not assigned in the inspector!");
-                continue;
-            }
-
-            // 링크 추가
-            data.hyperlinkText.AddLink(data.linkId, data.url);
-
-            // 링크가 포함된 텍스트 설정 (파란색과 밑줄 추가)
-            string fullText = $"I agree to the <link=\"{data.linkId}\"><color=#0000FF><u>{data.linkText}</u></color></link>.";
-            data.hyperlinkText.SetText(fullText);
-
-            Debug.Log($"Hyperlink text set for {data.linkId}: {data.hyperlinkText.GetComponent<TMP_Text>().text}");
+            Debug.LogError("HyperlinkText component is not assigned in the inspector!");
+            return;
         }
+
+        // 링크 추가
+        hyperlinkText.AddLink("link1", "https://gta7890.mycafe24.com/%EA%B3%B5%EC%A7%80%EA%B2%8C%EC%8B%9C%ED%8C%90/?vid=1");
+
+        // 링크가 포함된 텍스트 설정 (파란색과 밑줄 추가)
+        hyperlinkText.SetText("I agree the <link=\"link1\"><color=#0000FF><u>Privacy Policy</u></color></link>.");
+
+        Debug.Log("Privacy policy text set: " + hyperlinkText.GetComponent<TMP_Text>().text);
     }
 }
