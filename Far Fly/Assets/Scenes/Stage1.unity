@@ -1566,7 +1566,7 @@ MonoBehaviour:
               FlyDistance: 100
             PlacementType: 1
             PositionMode: 0
-            PositionOffset: {x: 400, y: -400}
+            PositionOffset: {x: 420, y: -300}
             ScalePulsingEffectSettings:
               CanInteract: 1
               IsEnabled: 0
@@ -1650,7 +1650,7 @@ MonoBehaviour:
               FlyDistance: 100
             PlacementType: 1
             PositionMode: 0
-            PositionOffset: {x: 500, y: -400}
+            PositionOffset: {x: 450, y: -250}
             ScalePulsingEffectSettings:
               CanInteract: 1
               IsEnabled: 0
@@ -1671,7 +1671,7 @@ MonoBehaviour:
               _keys:
               - 75029184-6336-4c36-b5e3-36945e69e0d7
               _values:
-              - Click anywhere to move right.
+              - Click to move right.
             PopupTitle:
               _keys:
               - 75029184-6336-4c36-b5e3-36945e69e0d7
@@ -3347,81 +3347,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1457826310}
   m_CullTransparentMesh: 1
---- !u!1 &1513628907
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1513628909}
-  - component: {fileID: 1513628908}
-  m_Layer: 0
-  m_Name: dd
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1513628908
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1513628907}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 51d609c3b353b9f479ae6ff1b7be4599, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Tutorials: []
-  ArrowModulePool:
-    CustomPoolSize: 5
-    OverridePoolSize: 0
-    Pool: []
-    Prefab: {fileID: 0}
-  HighlighterModulePool:
-    CustomPoolSize: 5
-    OverridePoolSize: 0
-    Pool: []
-    Prefab: {fileID: 0}
-  ImageModulePool:
-    CustomPoolSize: 5
-    OverridePoolSize: 0
-    Pool: []
-    Prefab: {fileID: 0}
-  PopupModulePool:
-    CustomPoolSize: 5
-    OverridePoolSize: 0
-    Pool: []
-    Prefab: {fileID: 0}
-  LocalizationData:
-    CurrentLanguageIndex: 0
-    Languages:
-    - Id: 7bd46823-df36-4974-b0c7-2182a72111c3
-      Name: English (US)
-  PlayOnStart: 0
-  StartingTutorialIndex: 0
-  OnLanguageChanged:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!4 &1513628909
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1513628907}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 635.2744, y: 1907.7155, z: 4.714487}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1562857594
 GameObject:
   m_ObjectHideFlags: 0
@@ -4566,7 +4491,7 @@ MonoBehaviour:
           ButtonText: 
         Owner: {fileID: 3867083984994898739}
         DebugActive: 0
-        PauseDuration: 1
+        PauseDuration: 2
         RandomizePauseDuration: 0
         MinPauseDuration: 1
         MaxPauseDuration: 3
@@ -4704,4 +4629,3 @@ SceneRoots:
   - {fileID: 752700250}
   - {fileID: 197923375}
   - {fileID: 644111059}
-  - {fileID: 1513628909}

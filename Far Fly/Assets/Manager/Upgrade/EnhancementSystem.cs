@@ -103,29 +103,49 @@ public class EnhancementSystem : MonoBehaviour
     {
         EnhancementData current = enhancementData[currentIndex];
         int price = CalculatePrice(current);
-        var request = new SubtractUserVirtualCurrencyRequest
-        {
-            VirtualCurrency = current.currencyType,
-            Amount = price
-        };
-        PlayFabClientAPI.SubtractUserVirtualCurrency(request,
+
+        // 현재 재화 확인
+        PlayFabClientAPI.GetUserInventory(new GetUserInventoryRequest(),
             result => {
-                current.currentLevel++;
-                UpdateEnhancementData(currentIndex, current.currentLevel);
-                UpdateUI(currentIndex);
-                confirmationPanel.SetActive(false);
-                Debug.Log($"강화 성공! {current.title} 새 레벨: {current.currentLevel}");
-                if (currencyDisplayScript != null)
+                int currentCurrency = result.VirtualCurrency.ContainsKey(current.currencyType) ? result.VirtualCurrency[current.currencyType] : 0;
+
+                if (currentCurrency < price)
                 {
-                    currencyDisplayScript.SyncCurrency();
+                    // 재화가 부족한 경우
+                    confirmationPanelText.text = $"Insufficient {current.currencyType}. You need {price} but have only {currentCurrency}.";
+                    return;
                 }
-                else
+
+                // 재화가 충분한 경우 강화 진행
+                var request = new SubtractUserVirtualCurrencyRequest
                 {
-                    Debug.LogWarning("PlayFabSpecificCurrencyDisplay 스크립트가 할당되지 않았습니다.");
-                }
+                    VirtualCurrency = current.currencyType,
+                    Amount = price
+                };
+                PlayFabClientAPI.SubtractUserVirtualCurrency(request,
+                    subtractResult => {
+                        current.currentLevel++;
+                        UpdateEnhancementData(currentIndex, current.currentLevel);
+                        UpdateUI(currentIndex);
+                        confirmationPanel.SetActive(false);
+                        Debug.Log($"강화 성공! {current.title} 새 레벨: {current.currentLevel}");
+                        if (currencyDisplayScript != null)
+                        {
+                            currencyDisplayScript.SyncCurrency();
+                        }
+                        else
+                        {
+                            Debug.LogWarning("PlayFabSpecificCurrencyDisplay 스크립트가 할당되지 않았습니다.");
+                        }
+                    },
+                    error => {
+                        Debug.LogError($"강화 실패: {error.ErrorMessage}");
+                        confirmationPanel.SetActive(false);
+                    }
+                );
             },
             error => {
-                Debug.LogError($"강화 실패: {error.ErrorMessage}");
+                Debug.LogError($"재화 확인 실패: {error.ErrorMessage}");
                 confirmationPanel.SetActive(false);
             }
         );

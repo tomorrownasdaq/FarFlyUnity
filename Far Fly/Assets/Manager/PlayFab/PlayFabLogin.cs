@@ -9,7 +9,8 @@ public class PlayFabLogin : MonoBehaviour
 {
     void Start()
     {
-        PlayGamesPlatform.Instance.Authenticate(ProcessAuthentication);
+        LoginStart();
+        //PlayGamesPlatform.Instance.Authenticate(ProcessAuthentication);
     }
 
     public void LoginStart()
