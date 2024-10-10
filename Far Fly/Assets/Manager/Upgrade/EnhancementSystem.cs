@@ -90,19 +90,34 @@ public class EnhancementSystem : MonoBehaviour
         return Mathf.RoundToInt(data.initialValue * Mathf.Pow(data.multiplier, data.currentLevel));
     }
 
+    private string GetCurrencyName(string currencyType)
+    {
+        switch (currencyType)
+        {
+            case "GL":
+                return "GOLD";
+            case "DI":
+                return "Diamond";
+            default:
+                return currencyType;
+        }
+    }
+
     private void ShowConfirmationPanel(int index)
     {
         currentIndex = index;
         confirmationPanel.SetActive(true);
         EnhancementData current = enhancementData[currentIndex];
         int price = CalculatePrice(current);
-        confirmationPanelText.text = $"Upgrade {current.title}\nPrice: {price} {current.currencyType}";
+        string currencyName = GetCurrencyName(current.currencyType);
+        confirmationPanelText.text = $"Upgrade {current.title}\nPrice: {price} {currencyName}";
     }
 
     public void Enhance()
     {
         EnhancementData current = enhancementData[currentIndex];
         int price = CalculatePrice(current);
+        string currencyName = GetCurrencyName(current.currencyType);
 
         // 현재 재화 확인
         PlayFabClientAPI.GetUserInventory(new GetUserInventoryRequest(),
@@ -112,7 +127,7 @@ public class EnhancementSystem : MonoBehaviour
                 if (currentCurrency < price)
                 {
                     // 재화가 부족한 경우
-                    confirmationPanelText.text = $"Insufficient {current.currencyType}. You need {price} but have only {currentCurrency}.";
+                    confirmationPanelText.text = $"Insufficient {currencyName}. You need {price} but have only {currentCurrency}.";
                     return;
                 }
 

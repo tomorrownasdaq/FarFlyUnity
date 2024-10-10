@@ -1,19 +1,40 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
-
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class Stage_1 : MonoBehaviour
+public class StageManager : MonoBehaviour
 {
-
-    public void Stage1show()
+    [Serializable]
+    public class StageInfo
     {
-        Debug.Log("Changing to main scene");
-        SceneManager.LoadScene("Stage1"); // 메인 씬의 인덱스 또는 이름
+        public string stageName;
+        public string sceneName;
+        public Button stageButton;
     }
-    
 
+    public List<StageInfo> stages = new List<StageInfo>();
+
+    void Start()
+    {
+        InitializeStageButtons();
+    }
+
+    void InitializeStageButtons()
+    {
+        foreach (var stage in stages)
+        {
+            if (stage.stageButton != null)
+            {
+                stage.stageButton.onClick.AddListener(() => LoadStage(stage.sceneName));
+            }
+        }
+    }
+
+    void LoadStage(string sceneName)
+    {
+        Debug.Log($"Changing to scene: {sceneName}");
+        SceneManager.LoadScene(sceneName);
+    }
 }
-
-

@@ -11,17 +11,11 @@ public class Ball2DCollision : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
-    private void Update()
-    {
-        if (rb.velocity.magnitude >= 30f && mmfPlayer == null)
-        {
-            mmfPlayer = GetComponent<MMF_Player>();
-        }
-    }
+    
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (mmfPlayer != null && rb.velocity.magnitude >= 100f)
+        if (rb.velocity.magnitude >= 400f && mmfPlayer != null && transform.position.x > -200f)
         {
             mmfPlayer.PlayFeedbacks();
         }
