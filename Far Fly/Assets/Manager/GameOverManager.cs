@@ -221,23 +221,64 @@ public class GameOverManager : MonoBehaviour
 
     private void SubmitScoreToLeaderboard(float distance)
     {
+        PlayFabClientAPI.GetPlayerStatistics(
+            new GetPlayerStatisticsRequest(),
+            result => {
+                var stats = result.Statistics;
+                int currentBest = 0;
+                foreach (var stat in stats)
+                {
+                    if (stat.StatisticName == "BestDistance")
+                    {
+                        currentBest = stat.Value;
+                        break;
+                    }
+                }
+
+                if (Mathf.RoundToInt(distance) > currentBest)
+                {
+                    UpdatePersonalBestAndLeaderboard(distance);
+                }
+                else
+                {
+                    Debug.Log($"Current distance ({distance}) did not beat personal best ({currentBest}). Score not updated.");
+                }
+            },
+            error => {
+                Debug.LogError($"Failed to get player statistics: {error.ErrorMessage}");
+                // 에러 발생 시 일단 업데이트 시도
+                UpdatePersonalBestAndLeaderboard(distance);
+            }
+        );
+    }
+
+    private void UpdatePersonalBestAndLeaderboard(float distance)
+    {
         var request = new UpdatePlayerStatisticsRequest
         {
             Statistics = new List<StatisticUpdate>
             {
                 new StatisticUpdate
                 {
-                    StatisticName = "Distance",
+                    StatisticName = "BestDistance",
                     Value = Mathf.RoundToInt(distance)
                 }
             }
         };
-        PlayFabClientAPI.UpdatePlayerStatistics(request, OnLeaderboardUpdate, OnLeaderboardUpdateFailure);
+        PlayFabClientAPI.UpdatePlayerStatistics(request,
+            result => {
+                Debug.Log("Successfully updated personal best and leaderboard");
+                // 여기서 UI 업데이트나 추가 작업을 수행할 수 있습니다.
+            },
+            error => {
+                Debug.LogError($"Failed to update statistics: {error.ErrorMessage}");
+            }
+        );
     }
 
     private void OnLeaderboardUpdate(UpdatePlayerStatisticsResult result)
     {
-        Debug.Log("Successfully submitted score to the leaderboard");
+        Debug.Log("Successfully submitted new high score to the leaderboard");
     }
 
     private void OnLeaderboardUpdateFailure(PlayFabError error)
