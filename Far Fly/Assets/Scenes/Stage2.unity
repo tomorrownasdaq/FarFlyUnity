@@ -3578,8 +3578,8 @@ MonoBehaviour:
   menuButton: {fileID: 2651275417686885957}
   doubleRewardButton: {fileID: 74238477}
   menuSceneName: MenuScene
-  goldMultiplier: 0.15
-  diamondMultiplier: 0.015
+  goldMultiplier: 0.1
+  diamondMultiplier: 0.012
 --- !u!4 &1182387669
 Transform:
   m_ObjectHideFlags: 0
