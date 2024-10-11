@@ -13,7 +13,7 @@ public class DisplayNameCreator : MonoBehaviour
     public Button goButton;
     public TextMeshProUGUI statusText;
     public List<Toggle> agreementToggles;
-    private const int MIN_NAME_LENGTH = 2;
+    private const int MIN_NAME_LENGTH = 3;
     private const int MAX_NAME_LENGTH = 16;
     private readonly Regex alphanumericRegex = new Regex(@"^[a-zA-Z0-9]+$");
 
