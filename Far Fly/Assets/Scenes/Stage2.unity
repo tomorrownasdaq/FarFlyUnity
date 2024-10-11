@@ -1856,7 +1856,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &644111057
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5194,7 +5194,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1320461498621250837, guid: eeb1313e6357482498bd68ae536767f5, type: 3}
       propertyPath: accelerationRate
-      value: 2000
+      value: 300
       objectReference: {fileID: 0}
     - target: {fileID: 1320461498621250837, guid: eeb1313e6357482498bd68ae536767f5, type: 3}
       propertyPath: rocketButtonImage

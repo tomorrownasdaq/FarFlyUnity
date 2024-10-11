@@ -470,6 +470,7 @@
 "Assets/Manager/PowerManager.cs"
 "Assets/Manager/PowerRechargeManager.cs"
 "Assets/Manager/PrivacyPolicyHyper.cs"
+"Assets/Manager/Purchase/MultiCurrencyPlus.cs"
 "Assets/Manager/Purchase/MultiCurrencyPurchaser.cs"
 "Assets/Manager/RetryManager.cs"
 "Assets/Manager/RocketAceelerator.cs"
