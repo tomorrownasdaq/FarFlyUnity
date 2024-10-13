@@ -1512,7 +1512,7 @@ MonoBehaviour:
           _componentName: 
           _unityEventName: 
         TriggerTimerAmount: 3
-        Type: 5
+        Type: 0
         UIButtonTarget: {fileID: 0}
       Audio:
         Clip: {fileID: 0}
@@ -1699,7 +1699,7 @@ MonoBehaviour:
               _keys:
               - 75029184-6336-4c36-b5e3-36945e69e0d7
               _values:
-              - Click to move right.
+              - Keep Click to move right.
             PopupTitle:
               _keys:
               - 75029184-6336-4c36-b5e3-36945e69e0d7
