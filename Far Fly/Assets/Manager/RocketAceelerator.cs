@@ -21,6 +21,7 @@ public class RocketItemButtonAccelerator : MonoBehaviour
         public float baseValue;
         public float growthRate;
         public int currentLevel;
+        public float additionalValue; // 새로 추가된 필드
     }
 
     [Header("Enhancement Data")]
@@ -200,6 +201,6 @@ public class RocketItemButtonAccelerator : MonoBehaviour
 
     private float CalculateEnhancedValue(EnhancementValue enhancement)
     {
-        return enhancement.baseValue + (enhancement.growthRate * enhancement.currentLevel);
+        return enhancement.baseValue + (enhancement.growthRate * enhancement.currentLevel) + enhancement.additionalValue;
     }
 }

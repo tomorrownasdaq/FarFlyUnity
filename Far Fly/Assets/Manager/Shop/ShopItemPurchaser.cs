@@ -1,11 +1,13 @@
 using UnityEngine;
 using PlayFab;
+using System.Collections;
 using PlayFab.ClientModels;
 using PlayFab.EconomyModels;
 using System;
 
 public class ShopItemPurchaser : MonoBehaviour
 {
+    [SerializeField] private GameObject buySuccessPanel;
     private int price;
     private string itemId;
     private string playerId;
@@ -142,6 +144,7 @@ public class ShopItemPurchaser : MonoBehaviour
                 PlayFabEconomyAPI.AddInventoryItems(addItemRequest,
                     addItemResult => {
                         Debug.Log($"아이템 {itemId}를 플레이어 {titlePlayerAccountId}의 인벤토리에 추가했습니다. ({gameObject.name})");
+                        ShowBuySuccessPanel();
                     },
                     addItemError => {
                         Debug.LogError($"아이템을 인벤토리에 추가하는 데 실패했습니다 for {gameObject.name}: {addItemError.ErrorMessage}");
@@ -153,6 +156,26 @@ public class ShopItemPurchaser : MonoBehaviour
             }
         );
     }
+
+    private void ShowBuySuccessPanel()
+    {
+        if (buySuccessPanel != null)
+        {
+            buySuccessPanel.SetActive(true);
+            StartCoroutine(HideBuySuccessPanelAfterDelay());
+        }
+        else
+        {
+            Debug.LogWarning("BuySuccess Panel is not assigned in the inspector.");
+        }
+    }
+
+    private IEnumerator HideBuySuccessPanelAfterDelay()
+    {
+        yield return new WaitForSeconds(2f);
+        buySuccessPanel.SetActive(false);
+    }
+
 
     public void GetCurrencyBalances()
     {

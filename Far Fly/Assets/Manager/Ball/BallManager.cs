@@ -13,6 +13,9 @@ public class BallManager : MonoBehaviour
     public float maxXPosition = 100f;
     public float maxMapPosition = 100f;
 
+    // 새로 추가된 변수
+    public float additionalACC = 0f;
+
     private Rigidbody2D rb;
     private float currentSpeed = 0f;
     private bool isAccelerating = false;
@@ -118,8 +121,8 @@ public class BallManager : MonoBehaviour
         {
             if (float.TryParse(result.Data["ACC"], out float loadedAccelerationRate))
             {
-                accelerationRate = loadedAccelerationRate;
-                Debug.Log($"Loaded ACC value from PlayFab Title Data: {accelerationRate}");
+                accelerationRate = loadedAccelerationRate + additionalACC;
+                Debug.Log($"Loaded ACC value from PlayFab Title Data: {loadedAccelerationRate}, Added additional ACC: {additionalACC}, Final ACC: {accelerationRate}");
             }
             else
             {
@@ -142,17 +145,19 @@ public class BallManager : MonoBehaviour
         {
             if (float.TryParse(result.Data["ACC"].Value, out float loadedAccelerationRate))
             {
-                accelerationRate = loadedAccelerationRate;
-                Debug.Log($"Loaded ACC value from PlayFab Player Data: {accelerationRate}");
+                accelerationRate = loadedAccelerationRate + additionalACC;
+                Debug.Log($"Loaded ACC value from PlayFab Player Data: {loadedAccelerationRate}, Added additional ACC: {additionalACC}, Final ACC: {accelerationRate}");
             }
             else
             {
-                Debug.LogWarning("Failed to parse ACC value from PlayFab Player Data. Using default value.");
+                Debug.LogWarning("Failed to parse ACC value from PlayFab Player Data. Using default value plus additional ACC.");
+                accelerationRate += additionalACC;
             }
         }
         else
         {
-            Debug.Log("ACC key not found in PlayFab Player Data. Using default acceleration rate.");
+            Debug.Log($"ACC key not found in PlayFab Player Data. Using default acceleration rate plus additional ACC: {accelerationRate + additionalACC}");
+            accelerationRate += additionalACC;
         }
     }
 
@@ -200,8 +205,8 @@ public class BallManager : MonoBehaviour
                 // ACC 값을 적용합니다 (선택적)
                 if (float.TryParse(accDescription, out float loadedAcc))
                 {
-                    accelerationRate = loadedAcc;
-                    Debug.Log($"Updated acceleration rate from selected item: {accelerationRate}");
+                    accelerationRate = loadedAcc + additionalACC;
+                    Debug.Log($"Updated acceleration rate from selected item: {loadedAcc}, Added additional ACC: {additionalACC}, Final ACC: {accelerationRate}");
                 }
             });
         }

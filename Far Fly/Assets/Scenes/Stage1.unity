@@ -3188,8 +3188,8 @@ MonoBehaviour:
   menuButton: {fileID: 2651275417686885957}
   doubleRewardButton: {fileID: 74238477}
   menuSceneName: MenuScene
-  goldMultiplier: 0.08
-  diamondMultiplier: 0.009
+  goldMultiplier: 0.06
+  diamondMultiplier: 0.007
 --- !u!4 &1182387669
 Transform:
   m_ObjectHideFlags: 0
@@ -3482,18 +3482,22 @@ MonoBehaviour:
     baseValue: 1
     growthRate: 1
     currentLevel: 0
+    additionalValue: 0
   forceX:
     baseValue: 500
     growthRate: 500
     currentLevel: 0
+    additionalValue: 500
   forceY:
     baseValue: 500
     growthRate: 500
     currentLevel: 0
+    additionalValue: 500
   duration:
     baseValue: 2
     growthRate: 1
     currentLevel: 0
+    additionalValue: 0
 --- !u!4 &1395057232
 Transform:
   m_ObjectHideFlags: 0
@@ -4790,6 +4794,10 @@ PrefabInstance:
     - target: {fileID: 1320461498621250837, guid: eeb1313e6357482498bd68ae536767f5, type: 3}
       propertyPath: rocketButton
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1320461498621250837, guid: eeb1313e6357482498bd68ae536767f5, type: 3}
+      propertyPath: additionalACC
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 1320461498621250837, guid: eeb1313e6357482498bd68ae536767f5, type: 3}
       propertyPath: pressedSprite

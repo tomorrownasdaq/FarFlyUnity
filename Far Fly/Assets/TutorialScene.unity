@@ -1692,8 +1692,10 @@ MonoBehaviour:
             UpdateEveryFrame: 0
             ButtonClickEvent: 0
             ButtonLabel:
-              _keys: []
-              _values: []
+              _keys:
+              - 75029184-6336-4c36-b5e3-36945e69e0d7
+              _values:
+              - 
             PopupImage: {fileID: 0}
             PopupMessage:
               _keys:
@@ -1704,7 +1706,7 @@ MonoBehaviour:
               _keys:
               - 75029184-6336-4c36-b5e3-36945e69e0d7
               _values:
-              - Intorudciton
+              - Start
             ShowButton: 0
           Enabled: 1
           OverridePrefab: 0
@@ -1728,8 +1730,8 @@ MonoBehaviour:
           _componentName: 
           _unityEventName: 
         TriggerTimerAmount: 5
-        Type: 5
-        UIButtonTarget: {fileID: 0}
+        Type: 4
+        UIButtonTarget: {fileID: 1394125207}
       Audio:
         Clip: {fileID: 0}
         Source: {fileID: 0}
@@ -1915,7 +1917,7 @@ MonoBehaviour:
               _keys:
               - 75029184-6336-4c36-b5e3-36945e69e0d7
               _values:
-              - Use Rocket Item
+              - Click to use Rocket item
             PopupTitle:
               _keys:
               - 75029184-6336-4c36-b5e3-36945e69e0d7
