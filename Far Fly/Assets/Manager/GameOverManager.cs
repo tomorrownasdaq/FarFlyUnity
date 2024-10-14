@@ -26,7 +26,7 @@ public class GameOverManager : MonoBehaviour
     [SerializeField] private float diamondMultiplier = 0.01f;
 
     private RewardedAd rewardedAd;
-    private const string RewardedAdUnitId = "ca-app-pub-6216768731453744/9225702681";
+    private const string RewardedAdUnitId = "ca-app-pub-6216768731453744~1066542453";
     private float currentDistance;
     private bool rewardDoubled = false;
     private bool isSubscribed = false;

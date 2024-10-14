@@ -5841,11 +5841,47 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currencyGroups:
   - currencyId: DI
-    items: []
+    items:
+    - productId: dia100
+      amountText: {fileID: 6852517326213397412}
+      priceText: {fileID: 8967833829982390839}
+      purchaseButton: {fileID: 8800449527853304231}
+    - productId: dia600
+      amountText: {fileID: 534792548}
+      priceText: {fileID: 1749798036}
+      purchaseButton: {fileID: 1347513047}
+    - productId: dia2500
+      amountText: {fileID: 1483475413}
+      priceText: {fileID: 1020751779}
+      purchaseButton: {fileID: 1345301676}
   - currencyId: PW
-    items: []
+    items:
+    - productId: pw5
+      amountText: {fileID: 368011445809844884}
+      priceText: {fileID: 4022261510437834982}
+      purchaseButton: {fileID: 3568169127933121398}
+    - productId: pw30
+      amountText: {fileID: 1560953175}
+      priceText: {fileID: 2112667756}
+      purchaseButton: {fileID: 1035863549}
+    - productId: pw100
+      amountText: {fileID: 1867901158}
+      priceText: {fileID: 1226332425}
+      purchaseButton: {fileID: 1491184998}
   - currencyId: GL
-    items: []
+    items:
+    - productId: gd1000
+      amountText: {fileID: 8637329886024538750}
+      priceText: {fileID: 677100619727000726}
+      purchaseButton: {fileID: 1094607873824118534}
+    - productId: gd7000
+      amountText: {fileID: 1755876801}
+      priceText: {fileID: 2080851321}
+      purchaseButton: {fileID: 561230733}
+    - productId: gd30000
+      amountText: {fileID: 1290665801}
+      priceText: {fileID: 1711261320}
+      purchaseButton: {fileID: 1883168033}
   initializationDelay: 0.5
 --- !u!1 &2080851318
 GameObject:

@@ -3,7 +3,6 @@ using System.Linq;
 using UnityEngine;
 using PlayFab;
 using PlayFab.EconomyModels;
-using PlayFab.ClientModels;
 using UnityEngine.Networking;
 using System.Collections;
 
@@ -11,23 +10,11 @@ public class StoreManager : MonoBehaviour
 {
     public GameObject itemListContent;
     public GameObject itemPrefab;
-    private List<PlayFab.EconomyModels.CatalogItem> catalogItems = new List<PlayFab.EconomyModels.CatalogItem>();
-    private HashSet<string> inventoryItemIds = new HashSet<string>();
+    private List<CatalogItem> catalogItems = new List<CatalogItem>();
 
     void Start()
     {
         // Assuming the player is already logged in
-        GetUserInventory();
-    }
-
-    public void GetUserInventory()
-    {
-        PlayFabClientAPI.GetUserInventory(new GetUserInventoryRequest(), OnGetUserInventorySuccess, OnError);
-    }
-
-    private void OnGetUserInventorySuccess(GetUserInventoryResult result)
-    {
-        inventoryItemIds = new HashSet<string>(result.Inventory.Select(item => item.ItemId));
         FetchCatalogItems();
     }
 
@@ -45,8 +32,8 @@ public class StoreManager : MonoBehaviour
 
     private void OnSearchItemsSuccess(SearchItemsResponse result)
     {
-        catalogItems = result.Items.Where(item => !inventoryItemIds.Contains(item.Id)).ToList();
-        Debug.Log($"Successfully retrieved {catalogItems.Count} items from the catalog (excluding inventory items)");
+        catalogItems = result.Items;
+        Debug.Log($"Successfully retrieved {catalogItems.Count} items from the catalog");
         DisplayItems();
     }
 
@@ -92,7 +79,7 @@ public class StoreManager : MonoBehaviour
         }
     }
 
-    private string GetItemTitle(PlayFab.EconomyModels.CatalogItem item)
+    private string GetItemTitle(CatalogItem item)
     {
         if (item.Title != null && item.Title.Count > 0)
         {
@@ -104,7 +91,7 @@ public class StoreManager : MonoBehaviour
         return "Untitled Item";
     }
 
-    private string GetItemPriceInfo(PlayFab.EconomyModels.CatalogItem item)
+    private string GetItemPriceInfo(CatalogItem item)
     {
         if (item.PriceOptions != null && item.PriceOptions.Prices != null && item.PriceOptions.Prices.Count > 0)
         {
@@ -121,7 +108,7 @@ public class StoreManager : MonoBehaviour
         return "Price not available";
     }
 
-    private string GetItemImageUrl(PlayFab.EconomyModels.CatalogItem item)
+    private string GetItemImageUrl(CatalogItem item)
     {
         if (item.Images != null && item.Images.Count > 0)
         {

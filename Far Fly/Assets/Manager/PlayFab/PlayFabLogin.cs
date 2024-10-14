@@ -14,6 +14,9 @@ public class PlayFabLogin : MonoBehaviour
 
     void Start()
     {
+        PlayGamesPlatform.DebugLogEnabled = true;
+        PlayGamesPlatform.Activate();
+    
         if (string.IsNullOrEmpty(PlayFabSettings.staticSettings.TitleId))
         {
             PlayFabSettings.staticSettings.TitleId = "4AD5e";
