@@ -45,7 +45,7 @@ public class BallSpeedManager : MonoBehaviour
             float currentSpeed = ballRigidbody.velocity.magnitude;
 
             // X축 기준 이동 거리 계산
-            distanceTraveled = Mathf.Abs(ballRigidbody.position.x - initialPosition.x);
+            distanceTraveled = Mathf.Max(0f, ballRigidbody.position.x - initialPosition.x);
             UpdateDistanceText();
 
             // 디버그 정보 출력

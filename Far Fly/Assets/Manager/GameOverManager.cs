@@ -21,7 +21,7 @@ public class GameOverManager : MonoBehaviour
     [SerializeField] private Button doubleRewardButton;
 
     [Header("Settings")]
-    public string menuSceneName = "StageScene";
+    public string menuSceneName = "MenuScene";
     [SerializeField] private float goldMultiplier = 0.1f;
     [SerializeField] private float diamondMultiplier = 0.01f;
 
