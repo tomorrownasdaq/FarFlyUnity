@@ -1,17 +1,18 @@
 using UnityEngine;
+using TMPro;
 
 public class BallSpeedManager : MonoBehaviour
 {
     public Rigidbody2D ballRigidbody;
     public float stopThreshold = 10f;
     public float gameOverXThreshold = 10f;
-
     public bool gameOver = false;
     private Vector2 initialPosition;
     private float distanceTraveled = 0f;
-
     [SerializeField] private float debugUpdateInterval = 1f;
     private float debugTimer = 0f;
+
+    [SerializeField] private TextMeshProUGUI distanceText; // Inspector에서 연결할 TextMeshPro 컴포넌트
 
     private void Start()
     {
@@ -25,8 +26,15 @@ public class BallSpeedManager : MonoBehaviour
                 return;
             }
         }
+
+        if (distanceText == null)
+        {
+            Debug.LogError("Distance TextMeshProUGUI component is not assigned. Please assign it in the Inspector.");
+        }
+
         initialPosition = ballRigidbody.position;
         Debug.Log($"Initial position set to: {initialPosition}");
+        UpdateDistanceText();
     }
 
     private void Update()
@@ -36,8 +44,9 @@ public class BallSpeedManager : MonoBehaviour
             // 현재 속도 계산
             float currentSpeed = ballRigidbody.velocity.magnitude;
 
-            // 이동 거리 계산
-            distanceTraveled = Vector2.Distance(initialPosition, ballRigidbody.position);
+            // X축 기준 이동 거리 계산
+            distanceTraveled = Mathf.Abs(ballRigidbody.position.x - initialPosition.x);
+            UpdateDistanceText();
 
             // 디버그 정보 출력
             debugTimer += Time.deltaTime;
@@ -54,6 +63,14 @@ public class BallSpeedManager : MonoBehaviour
                 gameOver = true;
                 GameOver();
             }
+        }
+    }
+
+    private void UpdateDistanceText()
+    {
+        if (distanceText != null)
+        {
+            distanceText.text = $"Distance: {distanceTraveled:F2}";
         }
     }
 
@@ -78,6 +95,7 @@ public class BallSpeedManager : MonoBehaviour
             ballRigidbody.velocity = Vector2.zero;
             ballRigidbody.position = initialPosition;
             distanceTraveled = 0f;
+            UpdateDistanceText();
             Debug.Log("Ball reset to initial position.");
         }
         else
