@@ -15,7 +15,7 @@ public class Ball2DCollision : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (rb.velocity.magnitude >= 400f && mmfPlayer != null && transform.position.x > -200f)
+        if (rb.linearVelocity.magnitude >= 400f && mmfPlayer != null && transform.position.x > -200f)
         {
             mmfPlayer.PlayFeedbacks();
         }

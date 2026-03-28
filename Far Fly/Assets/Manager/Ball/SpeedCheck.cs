@@ -2,16 +2,16 @@ using UnityEngine;
 
 public class SpeedChecker : MonoBehaviour
 {
-    public Rigidbody targetRigidbody; // ¼Óµµ¸¦ Ã¼Å©ÇÒ ´ë»ó Rigidbody
-    public float speedThreshold = 10f; // ¼Óµµ ÀÓ°è°ª
+    public Rigidbody targetRigidbody; // ï¿½Óµï¿½ï¿½ï¿½ Ã¼Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ Rigidbody
+    public float speedThreshold = 10f; // ï¿½Óµï¿½ ï¿½Ó°è°ª
 
     public void Update()
     {
-        if (targetRigidbody != null && targetRigidbody.velocity.magnitude <= speedThreshold)
+        if (targetRigidbody != null && targetRigidbody.linearVelocity.magnitude <= speedThreshold)
         {
-            // ¼Óµµ°¡ 10 ÀÌÇÏÀÏ ¶§ ½ÇÇàµÉ ÄÚµå
-            Debug.Log("¼Óµµ°¡ 10 ÀÌÇÏÀÔ´Ï´Ù!");
-            // ¿©±â¿¡ ¿øÇÏ´Â Ãß°¡ µ¿ÀÛÀ» ±¸ÇöÇÏ¼¼¿ä
+            // ï¿½Óµï¿½ï¿½ï¿½ 10 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Úµï¿½
+            Debug.Log("ï¿½Óµï¿½ï¿½ï¿½ 10 ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½!");
+            // ï¿½ï¿½ï¿½â¿¡ ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ß°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½
         }
     }
 }

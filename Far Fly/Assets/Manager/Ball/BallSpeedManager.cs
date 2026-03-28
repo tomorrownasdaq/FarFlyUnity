@@ -12,7 +12,7 @@ public class BallSpeedManager : MonoBehaviour
     [SerializeField] private float debugUpdateInterval = 1f;
     private float debugTimer = 0f;
 
-    [SerializeField] private TextMeshProUGUI distanceText; // Inspector¿¡¼­ ¿¬°áÇÒ TextMeshPro ÄÄÆ÷³ÍÆ®
+    [SerializeField] private TextMeshProUGUI distanceText; // Inspectorï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ TextMeshPro ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
 
     private void Start()
     {
@@ -41,14 +41,14 @@ public class BallSpeedManager : MonoBehaviour
     {
         if (!gameOver && ballRigidbody != null)
         {
-            // ÇöÀç ¼Óµµ °è»ê
-            float currentSpeed = ballRigidbody.velocity.magnitude;
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½Óµï¿½ ï¿½ï¿½ï¿½
+            float currentSpeed = ballRigidbody.linearVelocity.magnitude;
 
-            // XÃà ±âÁØ ÀÌµ¿ °Å¸® °è»ê
+            // Xï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ ï¿½Å¸ï¿½ ï¿½ï¿½ï¿½
             distanceTraveled = Mathf.Max(0f, ballRigidbody.position.x - initialPosition.x);
             UpdateDistanceText();
 
-            // µð¹ö±× Á¤º¸ Ãâ·Â
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
             debugTimer += Time.deltaTime;
             if (debugTimer >= debugUpdateInterval)
             {
@@ -56,7 +56,7 @@ public class BallSpeedManager : MonoBehaviour
                 debugTimer = 0f;
             }
 
-            // Á¤Áö »óÅÂ È®ÀÎ
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½
             if (currentSpeed < stopThreshold && ballRigidbody.position.x > gameOverXThreshold)
             {
                 Debug.Log($"Game over condition met! Speed: {currentSpeed}, X position: {ballRigidbody.position.x}");
@@ -92,7 +92,7 @@ public class BallSpeedManager : MonoBehaviour
         if (ballRigidbody != null)
         {
             gameOver = false;
-            ballRigidbody.velocity = Vector2.zero;
+            ballRigidbody.linearVelocity = Vector2.zero;
             ballRigidbody.position = initialPosition;
             distanceTraveled = 0f;
             UpdateDistanceText();

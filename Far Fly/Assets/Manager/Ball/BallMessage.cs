@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // TextMeshPro¸¦ »ç¿ëÇÏ±â À§ÇØ Ãß°¡
+using TMPro; // TextMeshProï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
 
 public class BallMessage : MonoBehaviour
 {
-    public TMP_Text distanceText; // Inspector¿¡¼­ ¿¬°áÇÒ Text ÄÄÆ÷³ÍÆ®
+    public TMP_Text distanceText; // Inspectorï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Text ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
     private float initialPositionX;
     private Camera mainCamera;
     private Rigidbody2D rb;
@@ -17,30 +17,30 @@ public class BallMessage : MonoBehaviour
         initialPositionX = transform.position.x;
         mainCamera = Camera.main;
 
-        // UI ÅØ½ºÆ® ÃÊ±âÈ­ (Canvas ÀÚ½ÄÀ¸·Î »ý¼ºÇÏ°í Inspector¿¡¼­ ¿¬°á)
-        distanceText.gameObject.SetActive(false); // Ã³À½¿¡´Â ºñÈ°¼ºÈ­
+        // UI ï¿½Ø½ï¿½Æ® ï¿½Ê±ï¿½È­ (Canvas ï¿½Ú½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ Inspectorï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
+        distanceText.gameObject.SetActive(false); // Ã³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È°ï¿½ï¿½È­
 
     }
 
     void Update()
     {
-        // ... (±âÁ¸ ÄÚµå)
+        // ... (ï¿½ï¿½ï¿½ï¿½ ï¿½Úµï¿½)
 
-        if (Mathf.Abs(rb.velocity.x) < 0.1f && Mathf.Abs(rb.velocity.y) < 0.1f && transform.position.x>2 )
+        if (Mathf.Abs(rb.linearVelocity.x) < 0.1f && Mathf.Abs(rb.linearVelocity.y) < 0.1f && transform.position.x>2 )
         {
-            // ÀÌµ¿ °Å¸® °è»ê ¹× ÅØ½ºÆ® ¾÷µ¥ÀÌÆ®
+            // ï¿½Ìµï¿½ ï¿½Å¸ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ø½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
             float traveledDistance = transform.position.x - initialPositionX;
             distanceText.text = "Distance : " + traveledDistance.ToString("F1") + "m";
 
-            // UI ÅØ½ºÆ® È°¼ºÈ­ ¹× À§Ä¡ Á¶Àý
+            // UI ï¿½Ø½ï¿½Æ® È°ï¿½ï¿½È­ ï¿½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
             distanceText.gameObject.SetActive(true);
             RectTransform rt = distanceText.GetComponent<RectTransform>();
-            rt.anchoredPosition = Vector2.zero; // È­¸é Áß¾Ó¿¡ ¹èÄ¡
-            rb.velocity = new Vector2(0, 0); // Stop the ball
+            rt.anchoredPosition = Vector2.zero; // È­ï¿½ï¿½ ï¿½ß¾Ó¿ï¿½ ï¿½ï¿½Ä¡
+            rb.linearVelocity = new Vector2(0, 0); // Stop the ball
         }
         else
         {
-            // °øÀÌ ¿òÁ÷ÀÏ ¶§´Â UI ÅØ½ºÆ® ºñÈ°¼ºÈ­
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ UI ï¿½Ø½ï¿½Æ® ï¿½ï¿½È°ï¿½ï¿½È­
             distanceText.gameObject.SetActive(false);
         }
     }

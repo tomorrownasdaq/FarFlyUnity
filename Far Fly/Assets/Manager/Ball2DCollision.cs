@@ -30,7 +30,7 @@ public class BallCollisionEffect : MonoBehaviour
     {
         if (mmfPlayer != null && rb != null)
         {
-            float speed = rb.velocity.magnitude;
+            float speed = rb.linearVelocity.magnitude;
 
             if (speed > minSpeedThreshold)
             {

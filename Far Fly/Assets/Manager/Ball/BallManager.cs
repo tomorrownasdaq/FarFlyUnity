@@ -13,7 +13,7 @@ public class BallManager : MonoBehaviour
     public float maxXPosition = 100f;
     public float maxMapPosition = 100f;
 
-    // »õ·Î Ãß°¡µÈ º¯¼ö
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     public float additionalACC = 0f;
 
     private Rigidbody2D rb;
@@ -22,7 +22,7 @@ public class BallManager : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private StageInventoryManager inventoryManager;
 
-    // »õ·Î¿î º¯¼ö: ÅÍÄ¡ °¡´É ¿µ¿ªÀÇ »ó´Ü °æ°è
+    // ï¿½ï¿½ï¿½Î¿ï¿½ ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
     private float touchableAreaTopY;
 
     void Start()
@@ -48,30 +48,30 @@ public class BallManager : MonoBehaviour
         LoadValuesFromPlayFab();
         LoadSelectedItemImage();
 
-        // ÅÍÄ¡ °¡´É ¿µ¿ª °è»ê
+        // ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         CalculateTouchableArea();
     }
 
-    // »õ·Î¿î ¸Þ¼­µå: ÅÍÄ¡ °¡´É ¿µ¿ª °è»ê
+    // ï¿½ï¿½ï¿½Î¿ï¿½ ï¿½Þ¼ï¿½ï¿½ï¿½: ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
     void CalculateTouchableArea()
     {
-        // È­¸é ÇÏ´Ü 4/5 ¿µ¿ª¸¸ ÅÍÄ¡ °¡´ÉÇÏµµ·Ï ¼³Á¤
+        // È­ï¿½ï¿½ ï¿½Ï´ï¿½ 4/5 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         touchableAreaTopY = Screen.height * 0.2f;
     }
 
     void Update()
     {
-        // Å°º¸µå ÀÔ·Â Ã¼Å©
+        // Å°ï¿½ï¿½ï¿½ï¿½ ï¿½Ô·ï¿½ Ã¼Å©
         if (Input.GetKey(KeyCode.Space))
         {
             isAccelerating = true;
         }
 
-        // ÅÍÄ¡ ÀÔ·Â Ã¼Å© (¼öÁ¤µÈ ºÎºÐ)
+        // ï¿½ï¿½Ä¡ ï¿½Ô·ï¿½ Ã¼Å© (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Îºï¿½)
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
-            // ÅÍÄ¡ À§Ä¡°¡ È­¸é ÇÏ´Ü 4/5 ¿µ¿ª ³»¿¡ ÀÖ´ÂÁö È®ÀÎ
+            // ï¿½ï¿½Ä¡ ï¿½ï¿½Ä¡ï¿½ï¿½ È­ï¿½ï¿½ ï¿½Ï´ï¿½ 4/5 ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ï¿½ï¿½ È®ï¿½ï¿½
             if (touch.position.y < Screen.height - touchableAreaTopY)
             {
                 if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Stationary || touch.phase == TouchPhase.Moved)
@@ -87,15 +87,15 @@ public class BallManager : MonoBehaviour
         if (isAccelerating && transform.position.x < maxXPosition)
         {
             // Accelerate
-            currentSpeed = rb.velocity.x + accelerationRate * Time.fixedDeltaTime;
+            currentSpeed = rb.linearVelocity.x + accelerationRate * Time.fixedDeltaTime;
             currentSpeed = Mathf.Min(currentSpeed, maxSpeed); // Cap the speed
-            rb.velocity = new Vector2(currentSpeed, rb.velocity.y);
+            rb.linearVelocity = new Vector2(currentSpeed, rb.linearVelocity.y);
         }
         else
         {
             // Decelerate
-            currentSpeed = Mathf.MoveTowards(rb.velocity.x, 0, deceleration * Time.fixedDeltaTime);
-            rb.velocity = new Vector2(currentSpeed, rb.velocity.y);
+            currentSpeed = Mathf.MoveTowards(rb.linearVelocity.x, 0, deceleration * Time.fixedDeltaTime);
+            rb.linearVelocity = new Vector2(currentSpeed, rb.linearVelocity.y);
         }
         // Reset acceleration flag
         isAccelerating = false;
@@ -106,7 +106,7 @@ public class BallManager : MonoBehaviour
         if (collision.gameObject.CompareTag("Wall"))
         {
             // Reverse the x-velocity
-            rb.velocity = new Vector2(-rb.velocity.x, rb.velocity.y);
+            rb.linearVelocity = new Vector2(-rb.linearVelocity.x, rb.linearVelocity.y);
         }
     }
 
@@ -202,7 +202,7 @@ public class BallManager : MonoBehaviour
                     Debug.LogWarning("No image URL found for the selected item.");
                 }
 
-                // ACC °ªÀ» Àû¿ëÇÕ´Ï´Ù (¼±ÅÃÀû)
+                // ACC ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
                 if (float.TryParse(accDescription, out float loadedAcc))
                 {
                     accelerationRate = loadedAcc + additionalACC;
