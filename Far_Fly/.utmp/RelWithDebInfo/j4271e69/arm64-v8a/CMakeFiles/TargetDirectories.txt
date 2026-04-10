@@ -1,0 +1,5 @@
+C:/UnityProject/FarFlyUnity/Far_Fly/.utmp/RelWithDebInfo/j4271e69/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/UnityProject/FarFlyUnity/Far_Fly/.utmp/RelWithDebInfo/j4271e69/arm64-v8a/CMakeFiles/rebuild_cache.dir
+C:/UnityProject/FarFlyUnity/Far_Fly/.utmp/RelWithDebInfo/j4271e69/arm64-v8a/FramePacing/CMakeFiles/swappywrapper.dir
+C:/UnityProject/FarFlyUnity/Far_Fly/.utmp/RelWithDebInfo/j4271e69/arm64-v8a/FramePacing/CMakeFiles/edit_cache.dir
+C:/UnityProject/FarFlyUnity/Far_Fly/.utmp/RelWithDebInfo/j4271e69/arm64-v8a/FramePacing/CMakeFiles/rebuild_cache.dir
