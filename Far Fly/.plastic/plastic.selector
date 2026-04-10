@@ -1,4 +1,0 @@
-repository "Far Fly@kgta7890@cloud"
-  path "/"
-    br "/main"
-    co "/main"
