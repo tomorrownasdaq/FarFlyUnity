@@ -1,3 +1,5 @@
 # ninja log v5
-0	199	7975380852457825	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	54788644c81b1fdd
-201	347	7975380853859417	C:/UnityProject/FarFlyUnity/Far_Fly/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/6k5b1n3v/obj/arm64-v8a/libswappywrapper.so	b583b97f0d98cd28
+0	277	7975720133172078	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	54788644c81b1fdd
+278	396	7975720134295980	C:/UnityProject/FarFlyUnity/Far_Fly/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/6k5b1n3v/obj/arm64-v8a/libswappywrapper.so	b583b97f0d98cd28
+1	197	7975747280818795	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	54788644c81b1fdd
+198	380	7975747282458201	C:/UnityProject/FarFlyUnity/Far_Fly/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/6k5b1n3v/obj/arm64-v8a/libswappywrapper.so	b583b97f0d98cd28

@@ -15,6 +15,7 @@ namespace MoreMountains.Feedbacks
 	              "For this to work, you'll need to add a MMCameraZoom component to your Camera, or a MMCinemachineZoom if you're " +
 	              "using virtual cameras.")]
 	[MovedFrom(false, null, "MoreMountains.Feedbacks")]
+	[System.Serializable]
 	[FeedbackPath("Camera/Camera Zoom")]
 	public class MMF_CameraZoom : MMF_Feedback
 	{
@@ -123,7 +124,7 @@ namespace MoreMountains.Feedbacks
 			}
 			#endif
 			
-			MMCameraZoom camZoom = (MMCameraZoom)Object.FindObjectOfType(typeof(MMCameraZoom));
+			MMCameraZoom camZoom = (MMCameraZoom)Object.FindAnyObjectByType(typeof(MMCameraZoom));
 			if (camZoom != null)
 			{
 				return;

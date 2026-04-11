@@ -12,6 +12,7 @@ namespace MoreMountains.Feedbacks
 	[AddComponentMenu("")]
 	[FeedbackHelp("This feedback allows you to change the state of the target gameobject from active to inactive (or the opposite), on init, play, stop or reset. For each of these you can specify if you want to force a state (active or inactive), or toggle it (active becomes inactive, inactive becomes active).")]
 	[MovedFrom(false, null, "MoreMountains.Feedbacks")]
+	[System.Serializable]
 	[FeedbackPath("GameObject/Set Active")]
 	public class MMF_SetActive : MMF_Feedback
 	{
@@ -26,6 +27,10 @@ namespace MoreMountains.Feedbacks
 		{
 			get
 			{
+				if (ExtraTargetGameObjects == null)
+				{
+					return "";
+				}
 				if (ExtraTargetGameObjects.Count > 0)
 				{
 					return " (+"+ExtraTargetGameObjects.Count+")";
@@ -47,7 +52,10 @@ namespace MoreMountains.Feedbacks
 		public GameObject TargetGameObject;
 		/// a list of extra gameobjects we want to change the active state of
 		[Tooltip("a list of extra gameobjects we want to change the active state of")]
-		public List<GameObject> ExtraTargetGameObjects;
+		public List<GameObject> ExtraTargetGameObjects = new List<GameObject>();
+		/// if this is true, the applied state will be the one you select below. if this is false the applied state will be impacted by the play direction (inverting the choice set below if playing in reverse)
+		[Tooltip("if this is true, the applied state will be the one you select below. if this is false the applied state will be impacted by the play direction (inverting the choice set below if playing in reverse)")]
+		public bool IgnorePlayDirection = false;
         
 		[MMFInspectorGroup("States", true, 14)]
 		/// whether or not we should alter the state of the target object on init
@@ -109,12 +117,15 @@ namespace MoreMountains.Feedbacks
 			if (Active && (TargetGameObject != null))
 			{
 				_initialState = TargetGameObject.activeInHierarchy;
-				
-				for (int i = 0; i < ExtraTargetGameObjects.Count; i++)
-				{
-					_initialStates.Add(ExtraTargetGameObjects[i].activeInHierarchy);
-				}
 
+				if (ExtraTargetGameObjects != null)
+				{
+					for (int i = 0; i < ExtraTargetGameObjects.Count; i++)
+					{
+						_initialStates.Add(ExtraTargetGameObjects[i].activeInHierarchy);
+					}	
+				}
+				
 				if (SetStateOnInit)
 				{
 					SetStatus(StateOnInit);
@@ -235,9 +246,17 @@ namespace MoreMountains.Feedbacks
 			{
 				case PossibleStates.Active:
 					newState = NormalPlayDirection ? true : false;
+					if (IgnorePlayDirection)
+					{
+						newState = true;
+					}
 					break;
 				case PossibleStates.Inactive:
 					newState = NormalPlayDirection ? false : true;
+					if (IgnorePlayDirection)
+					{
+						newState = false;
+					}
 					break;
 				case PossibleStates.Toggle:
 					newState = !TargetGameObject.activeInHierarchy;

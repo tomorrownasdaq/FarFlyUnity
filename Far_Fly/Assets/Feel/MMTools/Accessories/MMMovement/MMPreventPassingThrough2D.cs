@@ -5,10 +5,11 @@ using UnityEngine.Serialization;
 
 namespace MoreMountains.Tools
 {
+	#if MM_PHYSICS2D
 	/// <summary>
 	/// Prevents fast moving objects from going through colliders by casting a ray backwards after each movement
 	/// </summary>
-	[AddComponentMenu("More Mountains/Tools/Movement/MMPreventPassingThrough2D")]
+	[AddComponentMenu("More Mountains/Tools/Movement/MM Prevent Passing Through 2D")]
 	public class MMPreventPassingThrough2D : MonoBehaviour 
 	{
 		public enum Modes { Raycast, BoxCast }
@@ -129,4 +130,5 @@ namespace MoreMountains.Tools
 			_positionLastFrame = this.transform.position; 
 		}
 	}
+	#endif
 }

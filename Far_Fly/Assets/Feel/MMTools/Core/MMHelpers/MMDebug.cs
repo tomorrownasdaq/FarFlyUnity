@@ -6,6 +6,7 @@ using System.Text;
 using System.Reflection;
 using System.Linq;
 using Debug = UnityEngine.Debug;
+using Object = UnityEngine.Object;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -229,7 +230,10 @@ namespace MoreMountains.Tools
 				return;
 			}
 
-			string callerObjectName = new StackTrace().GetFrame(1).GetMethod().ReflectedType.Name;
+			string callerObjectName = "";
+			#if !UNITY_WEBGL
+			 callerObjectName = new StackTrace().GetFrame(1).GetMethod().ReflectedType.Name;
+			#endif
 			color = (color == "") ? "#00FFFF" : color;
             
 			// colors
@@ -402,6 +406,8 @@ namespace MoreMountains.Tools
 
 		#region Casts
 
+		#if MM_PHYSICS2D
+		
 		/// <summary>
 		/// Draws a debug ray in 2D and does the actual raycast
 		/// </summary>
@@ -497,6 +503,8 @@ namespace MoreMountains.Tools
 			return new RaycastHit2D();        	
 		}
 
+		#endif
+
 		/// <summary>
 		/// Draws a debug ray in 3D and does the actual raycast
 		/// </summary>
@@ -573,7 +581,7 @@ namespace MoreMountains.Tools
 			if (_console == null)
 			{
 				// we try to find one in the scene
-				_console = (MMDebugOnScreenConsole) GameObject.FindObjectOfType(typeof(MMDebugOnScreenConsole));
+				_console = (MMDebugOnScreenConsole) Object.FindAnyObjectByType(typeof(MMDebugOnScreenConsole));
 			}
 
 			if (_console == null)

@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace MoreMountains.Tools
 {
+	#if MM_PHYSICS2D
 	/// <summary>
 	/// 2D Implementation of the CinemachineZone abstract class
 	/// </summary>
@@ -20,6 +21,7 @@ namespace MoreMountains.Tools
 		protected BoxCollider2D _boxCollider2D;
 		protected CircleCollider2D _circleCollider2D;
 		protected PolygonCollider2D _polygonCollider2D;
+		protected Mesh _mesh;
 		
 		#if MM_CINEMACHINE 
 		protected CinemachineConfiner _cinemachineConfiner;
@@ -88,7 +90,7 @@ namespace MoreMountains.Tools
 				BoxCollider2D boxCollider2D = _confinerGameObject.AddComponent<BoxCollider2D>();
 				boxCollider2D.size = _boxCollider2D.size;
 				boxCollider2D.offset = _boxCollider2D.offset;
-				boxCollider2D.usedByComposite = true;
+				boxCollider2D.compositeOperation = Collider2D.CompositeOperation.Merge;
 				boxCollider2D.isTrigger = true;
 			}
 
@@ -96,7 +98,7 @@ namespace MoreMountains.Tools
 			{
 				CircleCollider2D circleCollider2D = _confinerGameObject.AddComponent<CircleCollider2D>();
 				circleCollider2D.isTrigger = true;
-				circleCollider2D.usedByComposite = true;
+				circleCollider2D.compositeOperation = Collider2D.CompositeOperation.Merge;
 				circleCollider2D.offset = _circleCollider2D.offset;
 				circleCollider2D.radius = _circleCollider2D.radius;
 			}
@@ -105,7 +107,7 @@ namespace MoreMountains.Tools
 			{
 				PolygonCollider2D polygonCollider2D = _confinerGameObject.AddComponent<PolygonCollider2D>();
 				polygonCollider2D.isTrigger = true;
-				polygonCollider2D.usedByComposite = true;
+				polygonCollider2D.compositeOperation = Collider2D.CompositeOperation.Merge;
 				polygonCollider2D.offset = _polygonCollider2D.offset;
 				polygonCollider2D.points = _polygonCollider2D.points;
 			}
@@ -169,11 +171,15 @@ namespace MoreMountains.Tools
 			}
 			if (_polygonCollider2D != null && _polygonCollider2D.enabled)
 			{
-				Mesh mesh = _polygonCollider2D.CreateMesh(true, false);
-				mesh.RecalculateNormals();
-				Gizmos.DrawMesh(mesh, Vector2.zero, this.transform.rotation, this.transform.lossyScale);
+				if (_mesh == null)
+				{
+					_mesh = _polygonCollider2D.CreateMesh(true, false);
+				}
+				_mesh.RecalculateNormals();
+				Gizmos.DrawMesh(_mesh, Vector2.zero, this.transform.rotation, this.transform.lossyScale);
 			}
 		}
 		#endif
-	}    
+	}   
+	#endif
 }

@@ -10,6 +10,7 @@ namespace MoreMountains.Feedbacks
 	/// </summary>
 	[AddComponentMenu("")]
 	[MovedFrom(false, null, "MoreMountains.Feedbacks")]
+	[System.Serializable]
 	[FeedbackPath("Camera/Field of View")]
 	[FeedbackHelp(
 		"This feedback lets you control a camera's field of view over time. You'll need a MMCameraFieldOfViewShaker on your camera.")]
@@ -142,7 +143,7 @@ namespace MoreMountains.Feedbacks
 			}
 			#endif
 			
-			MMCameraFieldOfViewShaker fieldOfViewShaker = (MMCameraFieldOfViewShaker)Object.FindObjectOfType(typeof(MMCameraFieldOfViewShaker));
+			MMCameraFieldOfViewShaker fieldOfViewShaker = (MMCameraFieldOfViewShaker)Object.FindAnyObjectByType(typeof(MMCameraFieldOfViewShaker));
 			if (fieldOfViewShaker != null)
 			{
 				return;

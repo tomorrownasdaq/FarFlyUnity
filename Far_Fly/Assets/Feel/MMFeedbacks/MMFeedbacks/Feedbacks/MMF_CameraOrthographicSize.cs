@@ -13,6 +13,7 @@ namespace MoreMountains.Feedbacks
 	/// </summary>
 	[AddComponentMenu("")]
 	[MovedFrom(false, null, "MoreMountains.Feedbacks")]
+	[System.Serializable]
 	[FeedbackPath("Camera/Orthographic Size")]
 	[FeedbackHelp("This feedback lets you control a camera's orthographic size over time. You'll need a MMCameraOrthographicSizeShaker on your camera.")]
 	public class MMF_CameraOrthographicSize : MMF_Feedback
@@ -123,7 +124,7 @@ namespace MoreMountains.Feedbacks
 			}
 			#endif
 			
-			MMCameraOrthographicSizeShaker orthographicSizeShaker = (MMCameraOrthographicSizeShaker)Object.FindObjectOfType(typeof(MMCameraOrthographicSizeShaker));
+			MMCameraOrthographicSizeShaker orthographicSizeShaker = (MMCameraOrthographicSizeShaker)Object.FindAnyObjectByType(typeof(MMCameraOrthographicSizeShaker));
 			if (orthographicSizeShaker != null)
 			{
 				return;

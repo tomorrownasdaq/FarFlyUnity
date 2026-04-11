@@ -144,7 +144,8 @@ PlayerSettings:
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
   bundleVersion: 0.643
-  preloadedAssets: []
+  preloadedAssets:
+  - {fileID: -2357883551054587095, guid: e10e6aaad858c0047812c3e9d7bd39ac, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   xboxOneDisableKinectGpuReservation: 1
@@ -175,7 +176,7 @@ PlayerSettings:
     iPhone: 0
     tvOS: 0
   overrideDefaultApplicationIdentifier: 1
-  AndroidBundleVersionCode: 43
+  AndroidBundleVersionCode: 46
   AndroidMinSdkVersion: 33
   AndroidTargetSdkVersion: 36
   AndroidPreferredInstallLocation: 1

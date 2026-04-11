@@ -8,7 +8,7 @@ namespace MoreMountains.Tools
 	/// <summary>
 	/// A simple object pool outputting a single type of objects
 	/// </summary>
-	[AddComponentMenu("More Mountains/Tools/Object Pool/MMSimpleObjectPooler")]
+	[AddComponentMenu("More Mountains/Tools/Object Pool/MM Simple Object Pooler")]
 	public class MMSimpleObjectPooler : MMObjectPooler 
 	{
 		/// the game object we'll instantiate 
@@ -98,10 +98,7 @@ namespace MoreMountains.Tools
 				return null;
 			}
 
-			bool initialStatus = GameObjectToPool.activeSelf;
-			GameObjectToPool.SetActive(false);
-			GameObject newGameObject = (GameObject)Instantiate(GameObjectToPool);
-			GameObjectToPool.SetActive(initialStatus);
+			GameObject newGameObject = (GameObject)MMGameObjectExtensions.MMInstantiateDisabled(GameObjectToPool);
 			SceneManager.MoveGameObjectToScene(newGameObject, this.gameObject.scene);
 			if (NestWaitingPool)
 			{

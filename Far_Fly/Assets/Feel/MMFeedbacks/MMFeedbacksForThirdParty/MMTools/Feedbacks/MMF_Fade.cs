@@ -12,6 +12,7 @@ namespace MoreMountains.Feedbacks
 	[AddComponentMenu("")]
 	[FeedbackHelp("This feedback lets you trigger a fade event.")]
 	[MovedFrom(false, null, "MoreMountains.Feedbacks.MMTools")]
+	[System.Serializable]
 	[FeedbackPath("Camera/Fade")]
 	public class MMF_Fade : MMF_Feedback
 	{
@@ -194,7 +195,7 @@ namespace MoreMountains.Feedbacks
 		/// </summary>
 		public override void AutomaticShakerSetup()
 		{
-			if (GameObject.FindObjectOfType<MMFader>() != null)
+			if (Object.FindAnyObjectByType<MMFader>() != null)
 			{
 				return;
 			}

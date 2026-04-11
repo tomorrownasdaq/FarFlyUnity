@@ -2488,3 +2488,10 @@ TextureImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/MMTools/Core/MMSceneLoading/Sprites/LoadingAnimation.png
+  uploadId: 830868

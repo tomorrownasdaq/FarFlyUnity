@@ -8,7 +8,7 @@ namespace MoreMountains.Tools
 	/// <summary>
 	/// Add this component to an object and it'll be auto destroyed X seconds after its Start()
 	/// </summary>
-	[AddComponentMenu("More Mountains/Tools/Activation/MMTimedActivation")]
+	[AddComponentMenu("More Mountains/Tools/Activation/MM Timed Activation")]
 	public class MMTimedActivation : MonoBehaviour
 	{
 		/// the possible activation modes
@@ -122,6 +122,7 @@ namespace MoreMountains.Tools
 			}
 		}
 
+		#if MM_PHYSICS2D
 		/// <summary>
 		/// On trigger enter 2D, we start our countdown if needed
 		/// </summary>
@@ -145,6 +146,7 @@ namespace MoreMountains.Tools
 				StartChangeState();
 			}
 		}
+		#endif
 
 		/// <summary>
 		/// Returns true if the target matches our settings, false otherwise

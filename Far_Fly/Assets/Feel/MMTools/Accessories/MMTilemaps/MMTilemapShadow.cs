@@ -4,13 +4,14 @@ using UnityEngine.Tilemaps;
 
 namespace MoreMountains.Tools
 {
+	#if MM_PHYSICS2D
 	/// <summary>
 	/// A class to put on a tilemap so it acts as a shadow/copy of another reference tilemap.
 	/// Useful for wall shadows for example.
 	/// Offsetting the tilemap and changing its sorting order etc is done via the regular components
 	/// </summary>
 	[ExecuteAlways]
-	[AddComponentMenu("More Mountains/Tools/Tilemaps/MMTilemapShadow")]
+	[AddComponentMenu("More Mountains/Tools/Tilemaps/MM Tilemap Shadow")]
 	[RequireComponent(typeof(Tilemap))]
 	public class MMTilemapShadow : MonoBehaviour
 	{        
@@ -80,6 +81,6 @@ namespace MoreMountains.Tools
 			// we feed it our positions
 			destination.SetTiles(positions, allTiles);
 		}
-		
 	}
+	#endif
 }

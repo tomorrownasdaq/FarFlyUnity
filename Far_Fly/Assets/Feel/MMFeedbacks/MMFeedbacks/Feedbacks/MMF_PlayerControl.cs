@@ -11,6 +11,7 @@ namespace MoreMountains.Feedbacks
 	[AddComponentMenu("")]
 	[FeedbackHelp("This feedback allows you to control one or more target MMF Players")]
 	[MovedFrom(false, null, "MoreMountains.Feedbacks")]
+	[System.Serializable]
 	[FeedbackPath("Feedbacks/MMF Player Control")]
 	public class MMF_PlayerControl : MMF_Feedback
 	{
@@ -86,7 +87,7 @@ namespace MoreMountains.Feedbacks
 			PlayFeedbacksOnlyIfReversed,
 			PlayFeedbacksOnlyIfNormalDirection,
 			ResetFeedbacks,
-			Revert,
+			ChangeDirection,
 			SetDirectionTopToBottom,
 			SetDirectionBottomToTop,
 			RestoreInitialValues,
@@ -113,6 +114,10 @@ namespace MoreMountains.Feedbacks
 		protected override void CustomInitialization(MMF_Player owner)
 		{
 			base.CustomInitialization(owner);
+			if (TargetPlayers == null)
+			{
+				TargetPlayers = new List<MMF_Player>();
+			}
 		}
 
 		/// <summary>
@@ -150,7 +155,7 @@ namespace MoreMountains.Feedbacks
 					foreach (MMF_Player player in TargetPlayers) { player.Initialization(); }
 					break;
 				case Modes.PlayFeedbacksInReverse:
-					foreach (MMF_Player player in TargetPlayers) { player.PlayFeedbacksInReverse(position, feedbacksIntensity); }
+					foreach (MMF_Player player in TargetPlayers) { player.PlayFeedbacksInReverse(position, feedbacksIntensity, true); }
 					break;
 				case Modes.PlayFeedbacksOnlyIfReversed:
 					foreach (MMF_Player player in TargetPlayers) { player.PlayFeedbacksOnlyIfReversed(position, feedbacksIntensity); }
@@ -161,8 +166,8 @@ namespace MoreMountains.Feedbacks
 				case Modes.ResetFeedbacks:
 					foreach (MMF_Player player in TargetPlayers) { player.ResetFeedbacks(); }
 					break;
-				case Modes.Revert:
-					foreach (MMF_Player player in TargetPlayers) { player.Revert(); }
+				case Modes.ChangeDirection:
+					foreach (MMF_Player player in TargetPlayers) { player.ChangeDirection(); }
 					break;
 				case Modes.SetDirectionTopToBottom:
 					foreach (MMF_Player player in TargetPlayers) { player.SetDirectionTopToBottom(); }
